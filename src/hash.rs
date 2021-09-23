@@ -1,4 +1,4 @@
-use crate::{Error, Result};
+use crate::{Error, Result, SignerError};
 use openssl::pkey::{PKey, Private, Public};
 use openssl::{hash::MessageDigest, rsa::Rsa, sha::Sha256, sign::Signer};
 
@@ -28,12 +28,12 @@ impl Hash {
         let keypair_signer = keypair.clone();
 
         let mut signer =
-            Signer::new(msgd(), &keypair_signer).map_err(|err| Error::SignerCreate(err))?;
+            Signer::new(msgd(), &keypair_signer).map_err(|err| SignerError::Create(err))?;
         signer
             .update(data.as_ref())
-            .map_err(|err| Error::SignerUpdate(err))?;
+            .map_err(|err| SignerError::Update(err))?;
 
-        let signature = signer.sign_to_vec().map_err(|err| Error::SignerExec(err))?;
+        let signature = signer.sign_to_vec().map_err(|err| SignerError::Execute(err))?;
 
         Ok((Self(hash_triplet(previous, signature, data)), keypair))
     }
