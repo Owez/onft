@@ -1,5 +1,6 @@
-use crate::{Error, Result, SignerError};
+use crate::{Error, Result, SignerError, VerifierError};
 use openssl::pkey::{PKey, Private, Public};
+use openssl::sign::Verifier;
 use openssl::{hash::MessageDigest, rsa::Rsa, sha::Sha256, sign::Signer};
 
 pub struct Hash([u8; 32]);
@@ -12,12 +13,26 @@ impl Hash {
     }
 
     pub fn verify(
+        &self,
         previous: impl Into<Hash>,
         signature: impl AsRef<[u8]>,
         data: impl AsRef<[u8]>,
         pkey: PKey<Public>,
     ) -> Result<bool> {
-        todo!()
+        let mut verifier =
+            Verifier::new(msgd(), &pkey).map_err(|err| VerifierError::Create(err))?;
+        verifier
+            .update(data.as_ref())
+            .map_err(|err| VerifierError::Update(err))?;
+
+        let signature_verified = verifier
+            .verify(signature.as_ref())
+            .map_err(|err| VerifierError::Execute(err))?;
+        if !signature_verified {
+            return Ok(false);
+        }
+
+        Ok(self.0 == hash_triplet(previous, signature, data))
     }
 
     fn new_existing_keypair(
@@ -33,7 +48,9 @@ impl Hash {
             .update(data.as_ref())
             .map_err(|err| SignerError::Update(err))?;
 
-        let signature = signer.sign_to_vec().map_err(|err| SignerError::Execute(err))?;
+        let signature = signer
+            .sign_to_vec()
+            .map_err(|err| SignerError::Execute(err))?;
 
         Ok((Self(hash_triplet(previous, signature, data)), keypair))
     }
