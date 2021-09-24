@@ -20,15 +20,14 @@ impl Hash {
         data: impl AsRef<[u8]>,
         pkey: PKey<Public>,
     ) -> Result<bool> {
-        let mut verifier =
-            Verifier::new(msgd(), &pkey).map_err(|err| VerifierError::Create(err))?;
+        let mut verifier = Verifier::new(msgd(), &pkey).map_err(VerifierError::Create)?;
         verifier
             .update(data.as_ref())
-            .map_err(|err| VerifierError::Update(err))?;
+            .map_err(VerifierError::Update)?;
 
         let signature_verified = verifier
             .verify(signature.as_ref())
-            .map_err(|err| VerifierError::Execute(err))?;
+            .map_err(VerifierError::Execute)?;
         if !signature_verified {
             return Ok(false);
         }
@@ -43,15 +42,10 @@ impl Hash {
     ) -> Result<(Self, Vec<u8>, PKey<Private>)> {
         let keypair_signer = keypair.clone();
 
-        let mut signer =
-            Signer::new(msgd(), &keypair_signer).map_err(|err| SignerError::Create(err))?;
-        signer
-            .update(data.as_ref())
-            .map_err(|err| SignerError::Update(err))?;
+        let mut signer = Signer::new(msgd(), &keypair_signer).map_err(SignerError::Create)?;
+        signer.update(data.as_ref()).map_err(SignerError::Update)?;
 
-        let signature = signer
-            .sign_to_vec()
-            .map_err(|err| SignerError::Execute(err))?;
+        let signature = signer.sign_to_vec().map_err(SignerError::Execute)?;
 
         Ok((
             Self(hash_triplet(previous, signature.as_slice(), data)),
@@ -61,9 +55,8 @@ impl Hash {
     }
 
     fn gen_keypair() -> Result<PKey<Private>> {
-        let merr = |err| Error::KeyGen(err);
-        let keypair = Rsa::generate(Self::RSA_BITS).map_err(merr)?;
-        let keypair = PKey::from_rsa(keypair).map_err(merr)?;
+        let keypair = Rsa::generate(Self::RSA_BITS).map_err(Error::KeyGen)?;
+        let keypair = PKey::from_rsa(keypair).map_err(Error::KeyGen)?;
         Ok(keypair)
     }
 }

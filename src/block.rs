@@ -36,7 +36,7 @@ impl<'a> Block<'a> {
                 &previous_block.hash,
                 self.signature.as_slice(),
                 self.data.as_slice(),
-                self.ownership.clone().to_public()?,
+                self.ownership.clone().into_public()?,
             ),
             None => Err(Error::NoPreviousBlock),
         }
@@ -50,7 +50,7 @@ pub enum Ownership {
 }
 
 impl Ownership {
-    pub fn to_public(self) -> Result<PKey<Public>> {
+    pub fn into_public(self) -> Result<PKey<Public>> {
         // TODO: check if this is right
         let public_conversion = |err| Error::PublicConversion(err);
         match self {
