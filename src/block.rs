@@ -1,28 +1,18 @@
 use crate::{Error, Hash, Result};
 use openssl::pkey::{Id, PKey, Private, Public};
 
-pub struct Block<'a> {
-    pub previous_block: Option<&'a Block<'a>>,
+pub struct Block {
     pub hash: Hash,
     pub ownership: Ownership,
     pub signature: Vec<u8>,
     pub data: Vec<u8>,
 }
 
-impl<'a> Block<'a> {
-    pub fn new(
-        previous_block: impl Into<Option<&'a Block<'a>>>,
-        data: impl Into<Vec<u8>>,
-    ) -> Result<Self> {
-        let previous_block = previous_block.into();
-        let previous_hash = match previous_block {
-            Some(previous_block) => previous_block.hash.clone(),
-            None => Hash::GENESIS,
-        };
+impl<'a> Block {
+    pub fn new(previous_hash: impl Into<&'a Hash>, data: impl Into<Vec<u8>>) -> Result<Self> {
         let data = data.into();
-        let (hash, signature, pkey) = Hash::new(&previous_hash, data.as_slice())?;
+        let (hash, signature, pkey) = Hash::new(previous_hash, data.as_slice())?;
         Ok(Self {
-            previous_block,
             hash,
             ownership: pkey.into(),
             signature,
@@ -30,16 +20,19 @@ impl<'a> Block<'a> {
         })
     }
 
-    pub fn verify(&self) -> Result<bool> {
-        match self.previous_block {
-            Some(previous_block) => self.hash.verify(
-                &previous_block.hash,
-                self.signature.as_slice(),
-                self.data.as_slice(),
-                self.ownership.clone().into_public()?,
-            ),
-            None => Err(Error::NoPreviousBlock),
-        }
+    pub fn verify(&self, previous_hash: impl Into<&'a Hash>) -> Result<bool> {
+        self.hash.verify(
+            previous_hash.into(),
+            self.signature.as_slice(),
+            self.data.as_slice(),
+            self.ownership.clone().into_public()?,
+        )
+    }
+}
+
+impl Default for Block {
+    fn default() -> Self {
+        todo!()
     }
 }
 
@@ -52,14 +45,15 @@ pub enum Ownership {
 impl Ownership {
     pub fn into_public(self) -> Result<PKey<Public>> {
         // TODO: check if this is right
-        let public_conversion = |err| Error::PublicConversion(err);
         match self {
             Self::Them(pkey) => Ok(pkey),
             Self::Us(pkey) => PKey::public_key_from_raw_bytes(
-                pkey.raw_public_key().map_err(public_conversion)?.as_slice(),
+                pkey.raw_public_key()
+                    .map_err(Error::PublicConversion)?
+                    .as_slice(),
                 Id::RSA,
             )
-            .map_err(public_conversion),
+            .map_err(Error::PublicConversion),
         }
     }
 }

@@ -1,5 +1,7 @@
 use openssl::error::ErrorStack;
 
+/// TODO: document
+#[allow(missing_docs)]
 #[derive(Debug)]
 pub enum Error {
     Signer(SignerError),
@@ -9,6 +11,10 @@ pub enum Error {
     PublicConversion(ErrorStack),
 }
 
+// TODO: fmt
+
+/// TODO: document
+#[allow(missing_docs)]
 #[derive(Debug)]
 pub enum SignerError {
     Create(ErrorStack),
@@ -22,6 +28,10 @@ impl From<SignerError> for Error {
     }
 }
 
+// TODO: fmt
+
+/// TODO: document
+#[allow(missing_docs)]
 #[derive(Debug)]
 pub enum VerifierError {
     Create(ErrorStack),
@@ -34,6 +44,8 @@ impl From<VerifierError> for Error {
         Self::Verifier(err)
     }
 }
+
+// TODO: fmt
 
 pub type Result<T> = std::result::Result<T, Error>;
 

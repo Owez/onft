@@ -1,4 +1,4 @@
-use crate::{Error, Result, SignerError, VerifierError};
+use crate::{Block, Error, Result, SignerError, VerifierError};
 use openssl::pkey::{PKey, Private, Public};
 use openssl::{hash::MessageDigest, rsa::Rsa, sha::Sha256, sign::Signer, sign::Verifier};
 
@@ -9,13 +9,24 @@ impl Hash {
     pub const RSA_BITS: u32 = 2048;
     pub const GENESIS: Self = Hash([0; 32]);
 
-    pub fn new(previous: &Hash, data: impl AsRef<[u8]>) -> Result<(Self, Vec<u8>, PKey<Private>)> {
+    fn gen_keypair() -> Result<PKey<Private>> {
+        let keypair = Rsa::generate(Self::RSA_BITS).map_err(Error::KeyGen)?;
+        let keypair = PKey::from_rsa(keypair).map_err(Error::KeyGen)?;
+        Ok(keypair)
+    }
+}
+
+impl<'a> Hash {
+    pub fn new(
+        previous: impl Into<&'a Hash>,
+        data: impl AsRef<[u8]>,
+    ) -> Result<(Self, Vec<u8>, PKey<Private>)> {
         Self::new_existing_keypair(previous, data, Self::gen_keypair()?)
     }
 
     pub fn verify(
         &self,
-        previous: &Hash,
+        previous: impl Into<&'a Hash>,
         signature: impl AsRef<[u8]>,
         data: impl AsRef<[u8]>,
         pkey: PKey<Public>,
@@ -32,11 +43,11 @@ impl Hash {
             return Ok(false);
         }
 
-        Ok(self.0 == hash_triplet(previous, signature, data))
+        Ok(self.0 == hash_triplet(previous.into(), signature, data))
     }
 
     fn new_existing_keypair(
-        previous: &Hash,
+        previous: impl Into<&'a Hash>,
         data: impl AsRef<[u8]>,
         keypair: PKey<Private>,
     ) -> Result<(Self, Vec<u8>, PKey<Private>)> {
@@ -48,16 +59,28 @@ impl Hash {
         let signature = signer.sign_to_vec().map_err(SignerError::Execute)?;
 
         Ok((
-            Self(hash_triplet(previous, signature.as_slice(), data)),
+            Self(hash_triplet(previous.into(), signature.as_slice(), data)),
             signature,
             keypair,
         ))
     }
+}
 
-    fn gen_keypair() -> Result<PKey<Private>> {
-        let keypair = Rsa::generate(Self::RSA_BITS).map_err(Error::KeyGen)?;
-        let keypair = PKey::from_rsa(keypair).map_err(Error::KeyGen)?;
-        Ok(keypair)
+impl Default for Hash {
+    fn default() -> Self {
+        todo!()
+    }
+}
+
+impl From<Block> for Hash {
+    fn from(block: Block) -> Self {
+        block.hash
+    }
+}
+
+impl<'a> From<&'a Block> for &'a Hash {
+    fn from(block: &'a Block) -> Self {
+        &block.hash
     }
 }
 

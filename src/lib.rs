@@ -8,9 +8,11 @@
 #![warn(missing_docs)]
 
 mod block;
+mod chain;
 mod error;
 mod hash;
 
 pub use block::Block;
+pub use chain::Chain;
 pub use error::{Error, Result, SignerError, VerifierError};
 pub use hash::Hash;
