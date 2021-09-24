@@ -1,5 +1,5 @@
 [package]
-name = "nftz"
+name = "onft"
 version = "0.1.0"
 description = "Bespoke protocol and high-level implementation of Non-fungible token (NFT) technology 🚀"
 readme = "README.md"

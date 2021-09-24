@@ -1,4 +1,4 @@
-# NFTZ
+# Onft
 
 Bespoke protocol and high-level implementation of Non-fungible token (NFT) technology 🚀
 
