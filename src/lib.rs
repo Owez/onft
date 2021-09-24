@@ -1,5 +1,7 @@
+mod block;
 mod hash;
 
+pub use block::Block;
 pub use hash::Hash;
 
 use openssl::error::ErrorStack;
@@ -9,6 +11,8 @@ pub enum Error {
     Signer(SignerError),
     Verifier(VerifierError),
     KeyGen(ErrorStack),
+    NoPreviousBlock,
+    PublicConversion(ErrorStack)
 }
 
 #[derive(Debug)]
