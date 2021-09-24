@@ -1,7 +1,6 @@
 use crate::{Error, Result, SignerError, VerifierError};
 use openssl::pkey::{PKey, Private, Public};
-use openssl::sign::Verifier;
-use openssl::{hash::MessageDigest, rsa::Rsa, sha::Sha256, sign::Signer};
+use openssl::{hash::MessageDigest, rsa::Rsa, sha::Sha256, sign::Signer, sign::Verifier};
 
 #[derive(Clone)]
 pub struct Hash([u8; 32]);
