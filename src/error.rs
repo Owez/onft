@@ -1,4 +1,5 @@
 use openssl::error::ErrorStack;
+use std::fmt;
 
 /// TODO: document
 #[allow(missing_docs)]
@@ -9,10 +10,14 @@ pub enum Error {
     KeyGen(ErrorStack),
     NoPreviousBlock,
     PublicConversion(ErrorStack),
-    GenesisIsNotKey
+    GenesisIsNotKey,
 }
 
-// TODO: fmt
+impl fmt::Display for Error {
+    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        todo!()
+    }
+}
 
 /// TODO: document
 #[allow(missing_docs)]
@@ -29,7 +34,11 @@ impl From<SignerError> for Error {
     }
 }
 
-// TODO: fmt
+impl fmt::Display for SignerError {
+    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        todo!()
+    }
+}
 
 /// TODO: document
 #[allow(missing_docs)]
@@ -46,7 +55,11 @@ impl From<VerifierError> for Error {
     }
 }
 
-// TODO: fmt
+impl fmt::Display for VerifierError {
+    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        todo!()
+    }
+}
 
 pub type Result<T> = std::result::Result<T, Error>;
 
