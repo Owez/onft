@@ -2,13 +2,23 @@ use crate::{Error, Hash, Result};
 use openssl::pkey::{Id, PKey, Private, Public};
 
 pub struct Block {
+    /// The hash of this block.
     pub hash: Hash,
+    /// Ownership identifier, represents if we own it or not.
     pub ownership: Ownership,
+    /// Signature which wraps data into a key to verify ownership.
     pub signature: Vec<u8>,
+    /// Underlying data contained within this block.
     pub data: Vec<u8>,
 }
 
 impl<'a> Block {
+    /// Creates a new block from the previous block in a chain alongside the data
+    /// contained within this block.
+    ///
+    /// # Example
+    ///
+    /// TODO: example
     pub fn new(previous_hash: impl Into<&'a Hash>, data: impl Into<Vec<u8>>) -> Result<Self> {
         let data = data.into();
         let (hash, signature, pkey) = Hash::new(previous_hash, data.as_slice())?;
@@ -20,6 +30,11 @@ impl<'a> Block {
         })
     }
 
+    /// Verifies this individual block based upon the known hash of the last block.
+    ///
+    /// # Example
+    ///
+    /// TODO: example
     pub fn verify(&self, previous_hash: impl Into<&'a Hash>) -> Result<bool> {
         self.hash.verify(
             previous_hash.into(),
@@ -31,7 +46,7 @@ impl<'a> Block {
 }
 
 impl Default for Block {
-    /// Creates default genesis block
+    /// Creates default genesis block.
     fn default() -> Self {
         Self {
             hash: Hash::default(),
@@ -46,11 +61,13 @@ impl Default for Block {
 pub enum Ownership {
     Them(PKey<Public>),
     Us(PKey<Private>),
-    /// Special genesis ownership type as the genesis block is owned by nobody
+    /// Special genesis ownership type as the genesis block is owned by nobody.
     Genesis,
 }
 
 impl Ownership {
+    /// Attempts to convert this enumeration into a public key; ensure this
+    /// isn't ran on the genesis block.
     pub fn into_public(self) -> Result<PKey<Public>> {
         // TODO: check if this is right
         match self {

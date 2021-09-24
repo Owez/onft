@@ -6,8 +6,7 @@ use openssl::{hash::MessageDigest, rsa::Rsa, sha::Sha256, sign::Signer, sign::Ve
 pub struct Hash([u8; 32]);
 
 impl Hash {
-    pub const RSA_BITS: u32 = 2048;
-    pub const GENESIS: Self = Hash([0; 32]);
+    const RSA_BITS: u32 = 2048;
 
     fn gen_keypair() -> Result<PKey<Private>> {
         let keypair = Rsa::generate(Self::RSA_BITS).map_err(Error::KeyGen)?;
@@ -17,6 +16,13 @@ impl Hash {
 }
 
 impl<'a> Hash {
+    /// Creates a new hash from the previous one alongside the core data included
+    /// within the hash, automatically generating the public/private keypair;
+    /// returning this hash, the signature and the aforementioned keypair.
+    ///
+    /// # Example
+    ///
+    /// TODO: example
     pub fn new(
         previous: impl Into<&'a Hash>,
         data: impl AsRef<[u8]>,
@@ -24,6 +30,12 @@ impl<'a> Hash {
         Self::new_existing_keypair(previous, data, Self::gen_keypair()?)
     }
 
+    /// Verifies current hash using it's known `signature`, the `pkey` public key
+    /// and `data` whilst using the `previous` hash.
+    ///
+    /// # Example
+    ///
+    /// TODO: example
     pub fn verify(
         &self,
         previous: impl Into<&'a Hash>,
@@ -46,6 +58,8 @@ impl<'a> Hash {
         Ok(self.0 == hash_triplet(previous.into(), signature, data))
     }
 
+    /// Creates a new hash from the previous one alongside hte core data included
+    /// within the hash, manually inputting the public/private keypair.
     fn new_existing_keypair(
         previous: impl Into<&'a Hash>,
         data: impl AsRef<[u8]>,
@@ -67,7 +81,7 @@ impl<'a> Hash {
 }
 
 impl Default for Hash {
-    /// Creates default genesis hash
+    /// Creates default genesis hash.
     fn default() -> Self {
         // null forbids babes to feed dead bad beef to dudes
         Self([
