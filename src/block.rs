@@ -34,7 +34,10 @@ impl Default for Block {
     /// Creates default genesis block
     fn default() -> Self {
         Self {
-            ..Default::default()
+            hash: Hash::default(),
+            ownership: Ownership::Genesis,
+            signature: vec![],
+            data: vec![],
         }
     }
 }
@@ -61,13 +64,6 @@ impl Ownership {
             .map_err(Error::PublicConversion),
             Self::Genesis => Err(Error::GenesisIsNotKey),
         }
-    }
-}
-
-impl Default for Ownership {
-    /// Creates default genesis ownership model
-    fn default() -> Self {
-        Self::Genesis
     }
 }
 
