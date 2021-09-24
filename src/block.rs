@@ -31,8 +31,11 @@ impl<'a> Block {
 }
 
 impl Default for Block {
+    /// Creates default genesis block
     fn default() -> Self {
-        todo!()
+        Self {
+            ..Default::default()
+        }
     }
 }
 
@@ -40,6 +43,8 @@ impl Default for Block {
 pub enum Ownership {
     Them(PKey<Public>),
     Us(PKey<Private>),
+    /// Special genesis ownership type as the genesis block is owned by nobody
+    Genesis,
 }
 
 impl Ownership {
@@ -54,7 +59,15 @@ impl Ownership {
                 Id::RSA,
             )
             .map_err(Error::PublicConversion),
+            Self::Genesis => Err(Error::GenesisIsNotKey),
         }
+    }
+}
+
+impl Default for Ownership {
+    /// Creates default genesis ownership model
+    fn default() -> Self {
+        Self::Genesis
     }
 }
 

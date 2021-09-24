@@ -10,7 +10,10 @@ impl Chain {
         Ok(self)
     }
 
-    pub fn add_blocks(&mut self, data_iter: impl IntoIterator<Item = Vec<u8>>) -> Result<&mut Self> {
+    pub fn add_blocks(
+        &mut self,
+        data_iter: impl IntoIterator<Item = Vec<u8>>,
+    ) -> Result<&mut Self> {
         for data in data_iter.into_iter() {
             Self::add_block(self, data)?;
         }

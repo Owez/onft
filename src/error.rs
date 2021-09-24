@@ -9,6 +9,7 @@ pub enum Error {
     KeyGen(ErrorStack),
     NoPreviousBlock,
     PublicConversion(ErrorStack),
+    GenesisIsNotKey
 }
 
 // TODO: fmt

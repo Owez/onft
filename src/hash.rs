@@ -1,6 +1,7 @@
 use crate::{Block, Error, Result, SignerError, VerifierError};
 use openssl::pkey::{PKey, Private, Public};
 use openssl::{hash::MessageDigest, rsa::Rsa, sha::Sha256, sign::Signer, sign::Verifier};
+use std::convert::TryInto;
 
 #[derive(Clone)]
 pub struct Hash([u8; 32]);
@@ -67,8 +68,13 @@ impl<'a> Hash {
 }
 
 impl Default for Hash {
+    /// Creates default genesis hash
     fn default() -> Self {
-        todo!()
+        // null forbids babes to feed dead bad beef to dudes
+        Self([
+            0x0, 0x4, 0xB, 0x1, 0xD, 0xB, 0xA, 0xB, 0xE, 0x5, 0x2, 0xF, 0xE, 0xE, 0xD, 0xD, 0xE,
+            0xA, 0xD, 0xB, 0xA, 0xD, 0xB, 0xE, 0xE, 0xF, 0x2, 0xD, 0x0, 0x0, 0xD, 0x5,
+        ])
     }
 }
 
