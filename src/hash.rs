@@ -1,5 +1,5 @@
 use crate::{Block, Error, Result, SignerError, VerifierError};
-use openssl::pkey::{HasPublic, PKey, PKeyRef, Private, Public};
+use openssl::pkey::{HasPublic, PKey, PKeyRef, Private};
 use openssl::{hash::MessageDigest, rsa::Rsa, sha::Sha256, sign::Signer, sign::Verifier};
 
 #[derive(Debug, Clone, PartialEq, Eq)]

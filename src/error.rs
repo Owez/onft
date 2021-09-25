@@ -19,10 +19,8 @@ impl fmt::Display for Error {
     }
 }
 
-impl Into<()> for Error {
-    fn into(self) -> () {
-        ()
-    }
+impl From<Error> for () {
+    fn from(_: Error) -> Self {}
 }
 
 /// TODO: document
@@ -46,10 +44,8 @@ impl fmt::Display for SignerError {
     }
 }
 
-impl Into<()> for SignerError {
-    fn into(self) -> () {
-        ()
-    }
+impl From<SignerError> for () {
+    fn from(_: SignerError) -> Self {}
 }
 
 /// TODO: document
@@ -73,10 +69,8 @@ impl fmt::Display for VerifierError {
     }
 }
 
-impl Into<()> for VerifierError {
-    fn into(self) -> () {
-        ()
-    }
+impl From<VerifierError> for () {
+    fn from(_: VerifierError) -> Self {}
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

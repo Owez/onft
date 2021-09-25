@@ -54,6 +54,8 @@ impl Chain {
         }
         Ok(self)
     }
+
+    // TODO: more vec-like interface
 }
 
 impl Default for Chain {

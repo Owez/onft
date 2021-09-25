@@ -1,5 +1,5 @@
 use crate::{Error, Hash, Result};
-use openssl::pkey::{Id, PKey, Private, Public};
+use openssl::pkey::{PKey, Private, Public};
 
 #[derive(Debug, Clone)]
 pub struct Block {
