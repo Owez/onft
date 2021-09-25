@@ -37,20 +37,16 @@ impl<'a> Hash {
         data: impl AsRef<[u8]>,
         pkey: &PKeyRef<impl HasPublic>,
     ) -> Result<bool> {
-        todo!("oneshot-based verification for ed25519")
-        // let mut verifier = Verifier::new_without_digest(pkey).map_err(VerifierError::Create)?;
-        // verifier
-        //     .update(data.as_ref())
-        //     .map_err(VerifierError::Update)?;
+        let mut verifier = Verifier::new_without_digest(pkey).map_err(VerifierError::Create)?;
+        let signature_verified = verifier
+            .verify_oneshot(signature.as_ref(), data.as_ref())
+            .map_err(VerifierError::Execute)?;
 
-        // let signature_verified = verifier
-        //     .verify(signature.as_ref())
-        //     .map_err(VerifierError::Execute)?;
-        // if !signature_verified {
-        //     return Ok(false);
-        // }
-
-        // Ok(self.0 == hash_triplet(previous.into(), signature, data))
+        Ok(if signature_verified {
+            self.0 == hash_triplet(previous.into(), signature, data)
+        } else {
+            false
+        })
     }
 
     /// Creates a new hash from the previous one alongside hte core data included
@@ -81,10 +77,9 @@ impl<'a> Hash {
 impl Default for Hash {
     /// Creates default genesis hash.
     fn default() -> Self {
-        // null forbids babes to feed dead bad beef to dudes
         Self([
-            0x0, 0x4, 0xB, 0x1, 0xD, 0xB, 0xA, 0xB, 0xE, 0x5, 0x2, 0xF, 0xE, 0xE, 0xD, 0xD, 0xE,
-            0xA, 0xD, 0xB, 0xA, 0xD, 0xB, 0xE, 0xE, 0xF, 0x2, 0xD, 0x0, 0x0, 0xD, 0x5,
+            66, 108, 111, 111, 100, 121, 32, 103, 101, 110, 101, 115, 105, 115, 32, 98, 108, 111,
+            99, 107, 32, 109, 101, 115, 115, 97, 103, 101, 115, 46, 46, 46,
         ])
     }
 }
