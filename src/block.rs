@@ -37,12 +37,15 @@ impl<'a> Block {
     ///
     /// TODO: example
     pub fn verify(&self, previous_hash: impl Into<&'a Hash>) -> Result<bool> {
-        self.hash.verify(
-            previous_hash.into(),
-            self.signature.as_slice(),
-            self.data.as_slice(),
-            self.ownership.clone().into_public()?,
-        )
+        let previous_hash = previous_hash.into();
+        let signature = self.signature.as_slice();
+        let data = self.data.as_slice();
+
+        match &self.ownership {
+            Ownership::Them(pkey) => self.hash.verify(previous_hash, signature, data, pkey),
+            Ownership::Us(pkey) => self.hash.verify(previous_hash, signature, data, pkey),
+            Ownership::Genesis => Err(Error::GenesisIsNotKey),
+        }
     }
 }
 
@@ -64,25 +67,6 @@ pub enum Ownership {
     Us(PKey<Private>),
     /// Special genesis ownership type as the genesis block is owned by nobody.
     Genesis,
-}
-
-impl Ownership {
-    /// Attempts to convert this enumeration into a public key; ensure this
-    /// isn't ran on the genesis block.
-    pub fn into_public(self) -> Result<PKey<Public>> {
-        // TODO: check if this is right
-        match self {
-            Self::Them(pkey) => Ok(pkey),
-            Self::Us(pkey) => PKey::public_key_from_raw_bytes(
-                pkey.raw_public_key()
-                    .map_err(Error::PublicConversion)?
-                    .as_slice(),
-                Id::RSA,
-            )
-            .map_err(Error::PublicConversion),
-            Self::Genesis => Err(Error::GenesisIsNotKey),
-        }
-    }
 }
 
 impl From<PKey<Public>> for Ownership {

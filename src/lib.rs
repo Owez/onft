@@ -17,7 +17,7 @@ pub use chain::Chain;
 pub use error::{Error, Result, SignerError, VerifierError};
 pub use hash::Hash;
 
-/// Light prelude layer which directly exports all but the [Result] type and base [Error] enumeration
+/// Light prelude layer which directly exports all but result and error
 pub mod prelude {
     pub use crate::{Block, Chain, Hash, Ownership, SignerError, VerifierError};
 }
