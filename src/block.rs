@@ -8,7 +8,7 @@ pub struct Block {
     /// Ownership identifier, represents if we own it or not.
     pub ownership: Ownership,
     /// Signature which wraps data into a key to verify ownership.
-    pub signature: Vec<u8>,
+    pub signature: [u8; Hash::SIG_LEN],
     /// Underlying data contained within this block.
     pub data: Vec<u8>,
 }
@@ -38,12 +38,11 @@ impl<'a> Block {
     /// TODO: example
     pub fn verify(&self, previous_hash: impl Into<&'a Hash>) -> Result<bool> {
         let previous_hash = previous_hash.into();
-        let signature = self.signature.as_slice();
         let data = self.data.as_slice();
 
         match &self.ownership {
-            Ownership::Them(pkey) => self.hash.verify(previous_hash, signature, data, pkey),
-            Ownership::Us(pkey) => self.hash.verify(previous_hash, signature, data, pkey),
+            Ownership::Them(pkey) => self.hash.verify(previous_hash, self.signature, data, pkey),
+            Ownership::Us(pkey) => self.hash.verify(previous_hash, self.signature, data, pkey),
             Ownership::Genesis => Err(Error::GenesisIsNotKey),
         }
     }
@@ -55,7 +54,7 @@ impl Default for Block {
         Self {
             hash: Hash::default(),
             ownership: Ownership::Genesis,
-            signature: vec![],
+            signature: [0; Hash::SIG_LEN],
             data: vec![],
         }
     }
