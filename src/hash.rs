@@ -6,6 +6,7 @@ use openssl::{hash::MessageDigest, sha::Sha256, sign::Signer, sign::Verifier};
 pub struct Hash([u8; 32]);
 
 impl Hash {
+    /// Length of ED25518-based signatures in bytes
     pub const SIG_LEN: usize = 64;
 }
 
@@ -100,10 +101,6 @@ fn gen_keypair() -> Result<PKey<Private>> {
     PKey::generate_ed25519().map_err(Error::KeyGen)
 }
 
-fn msgd() -> MessageDigest {
-    MessageDigest::sha256()
-}
-
 fn hash_triplet(previous: &Hash, signature: impl AsRef<[u8]>, data: impl AsRef<[u8]>) -> [u8; 32] {
     let mut hasher = Sha256::new();
     hasher.update(&previous.0[..]);
@@ -122,7 +119,15 @@ mod tests {
     }
 
     #[test]
-    fn create_hash() {
-        Hash::new(&Hash::default(), "Hello, world!".as_bytes()).unwrap();
+    fn create_verify_hash() {
+        const DATA: &str = "Hello, world!";
+        let (hash, signature, pkey) = Hash::new(&Hash::default(), DATA.as_bytes()).unwrap();
+        let verified = hash
+            .verify(&Hash::default(), signature, DATA, &pkey)
+            .unwrap();
+
+        if !verified {
+            panic!("Valid hash not verified successfully")
+        }
     }
 }
