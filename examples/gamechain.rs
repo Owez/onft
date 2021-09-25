@@ -31,7 +31,7 @@ fn handle_stream(chain: &mut Chain, mut stream: TcpStream) -> Result<GameReport,
 
     // deserialize packet then add block
     let game_report = GameReport::from_packet(packet)?;
-    chain.add_block(&packet[..]).map_err(|_| ())?;
+    chain.push_data(&packet[..]).map_err(|_| ())?;
 
     Ok(game_report)
 }

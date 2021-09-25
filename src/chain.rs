@@ -32,7 +32,7 @@ impl Chain {
     /// # Example
     ///
     /// TODO: example
-    pub fn add_block(&mut self, data: impl Into<Vec<u8>>) -> Result<&mut Self> {
+    pub fn push_data(&mut self, data: impl Into<Vec<u8>>) -> Result<&mut Self> {
         let previous_block = self.0.last().unwrap();
         let new_block = Block::new(&previous_block.hash, data)?;
         self.0.push(new_block);
@@ -45,12 +45,12 @@ impl Chain {
     /// # Example
     ///
     /// TODO: example
-    pub fn add_blocks(
+    pub fn extend_data(
         &mut self,
         data_iter: impl IntoIterator<Item = Vec<u8>>,
     ) -> Result<&mut Self> {
         for data in data_iter.into_iter() {
-            Self::add_block(self, data)?;
+            Self::push_data(self, data)?;
         }
         Ok(self)
     }

@@ -6,7 +6,7 @@ fn main() {
     println!("Initial chain:\n{:?}", chain);
 
     // add block
-    chain.add_block("Hello, world!".as_bytes()).unwrap();
+    chain.push_data("Hello, world!".as_bytes()).unwrap();
     println!("New chain:\n{:?}", chain);
 
     // verify
