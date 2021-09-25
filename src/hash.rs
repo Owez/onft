@@ -2,7 +2,7 @@ use crate::{Block, Error, Result, SignerError, VerifierError};
 use openssl::pkey::{PKey, Private, Public};
 use openssl::{hash::MessageDigest, rsa::Rsa, sha::Sha256, sign::Signer, sign::Verifier};
 
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Hash([u8; 32]);
 
 impl Hash {
@@ -43,19 +43,20 @@ impl<'a> Hash {
         data: impl AsRef<[u8]>,
         pkey: PKey<Public>,
     ) -> Result<bool> {
-        let mut verifier = Verifier::new(msgd(), &pkey).map_err(VerifierError::Create)?;
-        verifier
-            .update(data.as_ref())
-            .map_err(VerifierError::Update)?;
+        todo!("verification with rsa");
+        // let mut verifier = Verifier::new(msgd(), &pkey).map_err(VerifierError::Create)?;
+        // verifier
+        //     .update(data.as_ref())
+        //     .map_err(VerifierError::Update)?;
 
-        let signature_verified = verifier
-            .verify(signature.as_ref())
-            .map_err(VerifierError::Execute)?;
-        if !signature_verified {
-            return Ok(false);
-        }
+        // let signature_verified = verifier
+        //     .verify(signature.as_ref())
+        //     .map_err(VerifierError::Execute)?;
+        // if !signature_verified {
+        //     return Ok(false);
+        // }
 
-        Ok(self.0 == hash_triplet(previous.into(), signature, data))
+        // Ok(self.0 == hash_triplet(previous.into(), signature, data))
     }
 
     /// Creates a new hash from the previous one alongside hte core data included

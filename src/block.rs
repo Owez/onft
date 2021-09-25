@@ -1,6 +1,7 @@
 use crate::{Error, Hash, Result};
 use openssl::pkey::{Id, PKey, Private, Public};
 
+#[derive(Debug, Clone)]
 pub struct Block {
     /// The hash of this block.
     pub hash: Hash,
@@ -57,7 +58,7 @@ impl Default for Block {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum Ownership {
     Them(PKey<Public>),
     Us(PKey<Private>),

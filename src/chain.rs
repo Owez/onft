@@ -1,5 +1,6 @@
 use crate::{Block, Result};
 
+#[derive(Debug, Clone)]
 pub struct Chain(Vec<Block>);
 
 impl Chain {

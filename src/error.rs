@@ -19,6 +19,12 @@ impl fmt::Display for Error {
     }
 }
 
+impl Into<()> for Error {
+    fn into(self) -> () {
+        ()
+    }
+}
+
 /// TODO: document
 #[allow(missing_docs)]
 #[derive(Debug)]
@@ -40,6 +46,12 @@ impl fmt::Display for SignerError {
     }
 }
 
+impl Into<()> for SignerError {
+    fn into(self) -> () {
+        ()
+    }
+}
+
 /// TODO: document
 #[allow(missing_docs)]
 #[derive(Debug)]
@@ -58,6 +70,12 @@ impl From<VerifierError> for Error {
 impl fmt::Display for VerifierError {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         todo!()
+    }
+}
+
+impl Into<()> for VerifierError {
+    fn into(self) -> () {
+        ()
     }
 }
 
