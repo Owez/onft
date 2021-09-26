@@ -38,6 +38,7 @@
 
 #![deny(unsafe_code)]
 #![warn(missing_docs)]
+#![doc(html_logo_url = "https://raw.githubusercontent.com/Owez/onft/master/logo.png", html_favicon_url = "https://raw.githubusercontent.com/Owez/onft/master/logo.png")]
 
 pub mod error;
 
