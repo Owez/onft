@@ -29,9 +29,9 @@ use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
 ///     let verified = new_hash.verify(&genesis_hash, signature, data, &pkey)?;
 ///
 ///     if verified {
-///         println!("Verified :)")
+///         println!("Verified")
 ///     } else {
-///         eprintln!("Not verified :(")
+///         eprintln!("Not verified")
 ///     }
 ///     Ok(())
 /// }
@@ -87,9 +87,9 @@ impl<'a> Hash {
     ///     let verified = new_hash.verify(&genesis_hash, signature, data, &pkey)?;
     ///
     ///     if verified {
-    ///         println!("Verified :)")
+    ///         println!("Verified")
     ///     } else {
-    ///         eprintln!("Not verified :(")
+    ///         eprintln!("Not verified")
     ///     }
     ///     Ok(())
     /// }

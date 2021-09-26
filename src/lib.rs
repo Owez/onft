@@ -1,5 +1,28 @@
 //! Bespoke protocol and high-level implementation of Non-fungible token (NFT) technology 🚀
 //!
+//! # Usage
+//!
+//! ```rust
+//! use onft::Chain;
+//!
+//! // create
+//! let mut chain = Chain::default();
+//! println!("Chain: {:?}", chain);
+//!
+//! // add block
+//! chain.push_data("Hello, world!").unwrap();
+//! println!("Chain: {:?}", chain);
+//!
+//! // verify
+//! if let Ok(true) = chain.verify() {
+//!     println!("Verified")
+//! } else {
+//!     eprintln!("Not verified")
+//! }
+//! ```
+//!
+//! Check the useful [`examples/`](https://github.com/Owez/onft/tree/master/examples) directory or the item-level documentation for more examples! 😊
+//!
 //! # Licensing
 //!
 //! This project is dual-licensed under both the [MIT](https://en.wikipedia.org/wiki/MIT_License) and [Apache](https://en.wikipedia.org/wiki/Apache_License) licenses, so feel free to use either at your discretion.
@@ -32,12 +55,10 @@ pub use hash::Hash;
 /// This gives access to in times simpler usage of this crate, for example:
 ///
 /// ```rust
-/// use onft::prelude::*
+/// use onft::prelude::*;
 ///
-/// fn main() {
-///     let block = Block::default().unwrap();
-///     println!("Block:\n{:?}", block);
-/// }
+/// let block = Block::default();
+/// println!("Block: {:?}", block);
 /// ```
 pub mod prelude {
     pub use crate::error::{SignerError, VerifierError};

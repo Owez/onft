@@ -26,9 +26,9 @@ use openssl::pkey::{PKey, Private, Public};
 ///     let verified = new_block.verify(&genesis_block.hash)?;
 ///
 ///     if verified {
-///         println!("Verified :)")
+///         println!("Verified")
 ///     } else {
-///         eprintln!("Not verified :(")
+///         eprintln!("Not verified")
 ///     }
 ///     Ok(())
 /// }
@@ -90,9 +90,9 @@ impl<'a> Block {
     ///     let verified = new_block.verify(&genesis_block.hash)?;
     ///
     ///     if verified {
-    ///         println!("Verified :)")
+    ///         println!("Verified")
     ///     } else {
-    ///         eprintln!("Not verified :(")
+    ///         eprintln!("Not verified")
     ///     }
     ///     Ok(())
     /// }

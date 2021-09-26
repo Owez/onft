@@ -4,9 +4,30 @@ use crate::{error::Result, Block};
 
 /// Representation of an Onft blockchain
 ///
+/// # Using
+///
+/// TODO: using
+///
 /// # Example
 ///
-/// TODO: example
+/// ```rust
+/// use onft::Chain;
+///
+/// // create
+/// let mut chain = Chain::default();
+/// println!("Chain: {:?}", chain);
+///
+/// // add block
+/// chain.push_data("Hello, world!").unwrap();
+/// println!("Chain: {:?}", chain);
+///
+/// // verify
+/// if let Ok(true) = chain.verify() {
+///     println!("Verified")
+/// } else {
+///     eprintln!("Not verified")
+/// }
+/// ```
 #[derive(Debug, Clone)]
 pub struct Chain(Vec<Block>);
 
