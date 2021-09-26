@@ -1,7 +1,13 @@
 use crate::{Block, Error, Result, SignerError, VerifierError};
 use openssl::pkey::{HasPublic, PKey, PKeyRef, Private};
-use openssl::{hash::MessageDigest, sha::Sha256, sign::Signer, sign::Verifier};
+use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
 
+/// Hash of a single block, containing the previous hash along with the message
+/// signature and the data
+///
+/// # Example
+///
+/// TODO: example
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Hash([u8; 32]);
 

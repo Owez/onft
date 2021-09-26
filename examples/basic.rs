@@ -1,3 +1,5 @@
+//! Simple example showing creation, addition and verification on a Onft blockchain
+
 use onft::Chain;
 
 fn main() {
@@ -6,7 +8,7 @@ fn main() {
     println!("Initial chain:\n{:?}", chain);
 
     // add block
-    chain.push_data("Hello, world!".as_bytes()).unwrap();
+    chain.push_data("Hello, world!").unwrap();
     println!("New chain:\n{:?}", chain);
 
     // verify

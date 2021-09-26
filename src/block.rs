@@ -1,6 +1,11 @@
 use crate::{Error, Hash, Result};
 use openssl::pkey::{PKey, Private, Public};
 
+/// Single block within a larger blockchain, providing access to a block of data
+///
+/// # Example
+///
+/// TODO: example
 #[derive(Debug, Clone)]
 pub struct Block {
     /// The hash of this block.
@@ -60,9 +65,12 @@ impl Default for Block {
     }
 }
 
+/// Contains ownership keys and information for a given block
 #[derive(Debug, Clone)]
 pub enum Ownership {
+    /// Owned by an external source as we have a general public key.
     Them(PKey<Public>),
+    /// Owned by us as we have a private key.
     Us(PKey<Private>),
     /// Special genesis ownership type as the genesis block is owned by nobody.
     Genesis,

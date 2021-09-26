@@ -1,5 +1,10 @@
 use crate::{Block, Result};
 
+/// Representation of an Onft blockchain
+///
+/// # Example
+///
+/// TODO: example
 #[derive(Debug, Clone)]
 pub struct Chain(Vec<Block>);
 

@@ -1,7 +1,7 @@
 use openssl::error::ErrorStack;
 use std::fmt;
 
-/// TODO: document
+/// Error variants, describing possible errors which may occur within this crate
 #[allow(missing_docs)]
 #[derive(Debug)]
 pub enum Error {
@@ -23,7 +23,7 @@ impl From<Error> for () {
     fn from(_: Error) -> Self {}
 }
 
-/// TODO: document
+/// Errors related to the creation of block signatures contained within hashes
 #[allow(missing_docs)]
 #[derive(Debug)]
 pub enum SignerError {
@@ -48,7 +48,7 @@ impl From<SignerError> for () {
     fn from(_: SignerError) -> Self {}
 }
 
-/// TODO: document
+/// Errors related to verification of hashes and block signatures
 #[allow(missing_docs)]
 #[derive(Debug)]
 pub enum VerifierError {
@@ -73,6 +73,7 @@ impl From<VerifierError> for () {
     fn from(_: VerifierError) -> Self {}
 }
 
+/// Type alias for results containing crate-based errors
 pub type Result<T> = std::result::Result<T, Error>;
 
 impl<T> From<SignerError> for Result<T> {
