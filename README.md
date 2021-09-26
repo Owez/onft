@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="logo.png" width=200>
+    <a href="https://github.com/Owez/onft"><img src="logo.png" width=200></a>
 </p>
 <p align="center">
     <a href="https://crates.io/crates/onft"><img src="https://img.shields.io/crates/v/onft.svg" alt="Crates.io"></a>
