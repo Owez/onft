@@ -1,4 +1,13 @@
-//! Contains error tasks such as [Result] and implementations
+//! Contains crate-level errors and implementations
+//!
+//! # Structure
+//!
+//! The structure of this erroring system is simple and reflects implementations such as [std::io]'s structure but less complex. It is structured in a high-level sense as such:
+//!
+//! - Abstract library error: [Error]
+//!     - Whilst signing a block: [SignerError]
+//!     - Whilst verifying a block: [VerifierError]
+//! - Module result wrapper type: [Result]
 
 use openssl::error::ErrorStack;
 use std::fmt;

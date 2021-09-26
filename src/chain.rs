@@ -1,6 +1,6 @@
 //! Contains [Chain] and implementations
 
-use crate::{Block, Result};
+use crate::{error::Result, Block};
 
 /// Representation of an Onft blockchain
 ///

@@ -1,6 +1,7 @@
 //! Contains [Hash](struct@Hash) and implementations
 
-use crate::{Block, Error, Result, SignerError, VerifierError};
+use crate::error::{Error, Result, SignerError, VerifierError};
+use crate::Block;
 use openssl::pkey::{HasPublic, PKey, PKeyRef, Private};
 use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
 
