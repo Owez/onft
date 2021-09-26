@@ -1,8 +1,13 @@
-# Onft
-
-[![Crates.io](https://img.shields.io/crates/v/onft.svg)](https://crates.io/crates/onft) [![Docs](https://docs.rs/onft/badge.svg)](https://docs.rs/onft/)
-
-Bespoke protocol and high-level implementation of Non-fungible token (NFT) technology 🚀
+<p align="center">
+    <img src="logo.png" width=200>
+</p>
+<p align="center">
+    <a href="https://crates.io/crates/onft"><img src="https://img.shields.io/crates/v/onft.svg" alt="Crates.io"></a>
+    <a href="https://docs.rs/onft/"><img src="https://docs.rs/onft/badge.svg" alt="Docs"></a>
+</p>
+<p align="center">
+    Bespoke protocol and high-level implementation of Non-fungible token (NFT) technology 🚀
+</p>
 
 ## Example
 
