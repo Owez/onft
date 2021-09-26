@@ -1,7 +1,6 @@
 //! Contains [Block], [Ownership] and implementations
 
-use crate::error::{Error, Result};
-use crate::Hash;
+use crate::{error::Error, Hash, Result};
 use openssl::pkey::{PKey, Private, Public};
 
 /// Single block within a larger blockchain, providing access to a block of data
