@@ -25,7 +25,12 @@
 //!
 //! # Usage
 //!
-//! TODO: usage
+//! Simply add the following to your `Cargo.toml` file:
+//!
+//! ```toml
+//! [dependencies]
+//! onft = "0.1.0-beta.2"
+//! ```
 //!
 //! # Licensing
 //!

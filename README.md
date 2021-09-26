@@ -1,5 +1,7 @@
 # Onft
 
+[![Crates.io](https://img.shields.io/crates/v/onft.svg)](https://crates.io/crates/onft) [![Docs](https://docs.rs/onft/badge.svg)](https://docs.rs/onft/)
+
 Bespoke protocol and high-level implementation of Non-fungible token (NFT) technology 🚀
 
 ## Example
@@ -27,7 +29,12 @@ Check the useful [`examples/`](https://github.com/Owez/onft/tree/master/examples
 
 ## Usage
 
-TODO: usage
+Simply add the following to your `Cargo.toml` file:
+
+```toml
+[dependencies]
+onft = "0.1.0-beta.2"
+```
 
 ## Licensing
 
