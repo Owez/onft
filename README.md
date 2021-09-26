@@ -2,7 +2,7 @@
 
 Bespoke protocol and high-level implementation of Non-fungible token (NFT) technology 🚀
 
-## Usage
+## Example
 
 ```rust
 use onft::Chain;
@@ -22,6 +22,12 @@ if let Ok(true) = chain.verify() {
     eprintln!("Not verified")
 }
 ```
+
+Check the useful [`examples/`](https://github.com/Owez/onft/tree/master/examples) directory or the item-level documentation for more examples! 😊
+
+## Usage
+
+TODO: usage
 
 ## Licensing
 
