@@ -1,3 +1,5 @@
+//! Contains error tasks such as [Result] and implementations
+
 use openssl::error::ErrorStack;
 use std::fmt;
 

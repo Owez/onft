@@ -1,3 +1,5 @@
+//! Contains [Hash](struct@Hash) and implementations
+
 use crate::{Block, Error, Result, SignerError, VerifierError};
 use openssl::pkey::{HasPublic, PKey, PKeyRef, Private};
 use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
@@ -15,7 +17,24 @@ use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
 ///
 /// # Example
 ///
-/// TODO: example
+/// ```rust
+/// use onft::Hash;
+///
+/// fn main() -> onft::Result<()> {
+///     let genesis_hash = Hash::default();
+///
+///     let data = "Hello, world!";
+///     let (new_hash, signature, pkey) = Hash::new(&genesis_hash, data)?;
+///     let verified = new_hash.verify(&genesis_hash, signature, data, &pkey)?;
+///
+///     if verified {
+///         println!("Verified :)")
+///     } else {
+///         eprintln!("Not verified :(")
+///     }
+///     Ok(())
+/// }
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Hash([u8; 32]);
 
@@ -40,8 +59,7 @@ impl<'a> Hash {
     ///     let data = "Hello, world!";
     ///     let (new_hash, _, _) = Hash::new(&genesis_hash, data)?;
     ///
-    ///     println!("Hash:
-    /// {:?}", new_hash);
+    ///     println!("Hash:\n{:?}", new_hash);
     ///     Ok(())
     /// }
     /// ```
@@ -57,7 +75,24 @@ impl<'a> Hash {
     ///
     /// # Example
     ///
-    /// TODO: example
+    /// ```rust
+    /// use onft::Hash;
+    ///
+    /// fn main() -> onft::Result<()> {
+    ///     let genesis_hash = Hash::default();
+    ///
+    ///     let data = "Hello, world!";
+    ///     let (new_hash, signature, pkey) = Hash::new(&genesis_hash, data)?;
+    ///     let verified = new_hash.verify(&genesis_hash, signature, data, &pkey)?;
+    ///
+    ///     if verified {
+    ///         println!("Verified :)")
+    ///     } else {
+    ///         eprintln!("Not verified :(")
+    ///     }
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn verify(
         &self,
         previous: impl Into<&'a Hash>,

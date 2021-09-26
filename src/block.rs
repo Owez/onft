@@ -1,3 +1,5 @@
+//! Contains [Block], [Ownership] and implementations
+
 use crate::{Error, Hash, Result};
 use openssl::pkey::{PKey, Private, Public};
 
@@ -28,7 +30,6 @@ use openssl::pkey::{PKey, Private, Public};
 ///     } else {
 ///         eprintln!("Not verified :(")
 ///     }
-///
 ///     Ok(())
 /// }
 /// ```
@@ -59,8 +60,7 @@ impl<'a> Block {
     ///     let data = "Hello, world!";
     ///     let block = Block::new(&genesis_block.hash, data)?;
     ///
-    ///     println!("Block:
-    /// {:?}", block);
+    ///     println!("Block:\n{:?}", block);
     ///     Ok(())
     /// }
     /// ```
@@ -94,7 +94,6 @@ impl<'a> Block {
     ///     } else {
     ///         eprintln!("Not verified :(")
     ///     }
-    ///
     ///     Ok(())
     /// }
     /// ```

@@ -1,3 +1,5 @@
+//! Contains [Chain] and implementations
+
 use crate::{Block, Result};
 
 /// Representation of an Onft blockchain
