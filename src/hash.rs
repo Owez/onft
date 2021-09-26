@@ -2,8 +2,16 @@ use crate::{Block, Error, Result, SignerError, VerifierError};
 use openssl::pkey::{HasPublic, PKey, PKeyRef, Private};
 use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
 
-/// Hash of a single block, containing the previous hash along with the message
-/// signature and the data
+/// Hash for a block allowing full blockchain usage
+///
+/// # Using
+///
+/// You can in high level terms do the following directly to a hash:
+///
+/// - Create a genesis hash: [Hash::default]
+/// - Create a hash containing hashed data: [Hash::new]
+/// - Verify a hash: [Hash::verify]
+/// - Get the length of a hash signature: [Hash::SIG_LEN]
 ///
 /// # Example
 ///
@@ -23,7 +31,20 @@ impl<'a> Hash {
     ///
     /// # Example
     ///
-    /// TODO: example
+    /// ```rust
+    /// use onft::Hash;
+    ///
+    /// fn main() -> onft::Result<()> {
+    ///     let genesis_hash = Hash::default();
+    ///
+    ///     let data = "Hello, world!";
+    ///     let (new_hash, _, _) = Hash::new(&genesis_hash, data)?;
+    ///
+    ///     println!("Hash:
+    /// {:?}", new_hash);
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn new(
         previous: impl Into<&'a Hash>,
         data: impl AsRef<[u8]>,

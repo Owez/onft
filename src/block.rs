@@ -3,9 +3,35 @@ use openssl::pkey::{PKey, Private, Public};
 
 /// Single block within a larger blockchain, providing access to a block of data
 ///
+/// # Using
+///
+/// You can in high level terms do the following directly to a block:
+///
+/// - Create a genesis block: [Block::default]
+/// - Create a block containing data: [Block::new]
+/// - Verify a block: [Block::verify]
+///
 /// # Example
 ///
-/// TODO: example
+/// ```rust
+/// use onft::Block;
+///
+/// fn main() -> onft::Result<()> {
+///     let genesis_block = Block::default();
+///
+///     let data = "Hello, world!";
+///     let new_block = Block::new(&genesis_block.hash, data)?;
+///     let verified = new_block.verify(&genesis_block.hash)?;
+///
+///     if verified {
+///         println!("Verified :)")
+///     } else {
+///         eprintln!("Not verified :(")
+///     }
+///
+///     Ok(())
+/// }
+/// ```
 #[derive(Debug, Clone)]
 pub struct Block {
     /// The hash of this block.
@@ -24,7 +50,20 @@ impl<'a> Block {
     ///
     /// # Example
     ///
-    /// TODO: example
+    /// ```rust
+    /// use onft::Block;
+    ///
+    /// fn main() -> onft::Result<()> {
+    ///     let genesis_block = Block::default();
+    ///
+    ///     let data = "Hello, world!";
+    ///     let block = Block::new(&genesis_block.hash, data)?;
+    ///
+    ///     println!("Block:
+    /// {:?}", block);
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn new(previous_hash: impl Into<&'a Hash>, data: impl Into<Vec<u8>>) -> Result<Self> {
         let data = data.into();
         let (hash, signature, pkey) = Hash::new(previous_hash, data.as_slice())?;
@@ -40,7 +79,25 @@ impl<'a> Block {
     ///
     /// # Example
     ///
-    /// TODO: example
+    /// ```rust
+    /// use onft::Block;
+    ///
+    /// fn main() -> onft::Result<()> {
+    ///     let genesis_block = Block::default();
+    ///
+    ///     let data = "Hello, world!";
+    ///     let new_block = Block::new(&genesis_block.hash, data)?;
+    ///     let verified = new_block.verify(&genesis_block.hash)?;
+    ///
+    ///     if verified {
+    ///         println!("Verified :)")
+    ///     } else {
+    ///         eprintln!("Not verified :(")
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn verify(&self, previous_hash: impl Into<&'a Hash>) -> Result<bool> {
         let previous_hash = previous_hash.into();
         let data = self.data.as_slice();
