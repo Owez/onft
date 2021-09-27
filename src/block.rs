@@ -249,11 +249,18 @@ impl Serialize for Ownership {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_bytes(
-            &self
-                .to_raw_public()
-                .map_err(|err| serde::ser::Error::custom(&format!("{}", err)))?[..],
-        )
+        const NAME: &str = "Ownership";
+        match self {
+            Ownership::Genesis => serializer.serialize_unit_variant(NAME, 0, "Genesis"),
+            _ => serializer.serialize_newtype_variant(
+                NAME,
+                1,
+                "Them",
+                &self
+                    .to_raw_public()
+                    .map_err(|err| serde::ser::Error::custom(&format!("{}", err)))?[..],
+            ),
+        }
     }
 }
 
