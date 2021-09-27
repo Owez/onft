@@ -9,6 +9,8 @@
 //!     - Whilst verifying a block: [VerifierError]
 //! - Module result wrapper type: [Result]
 
+#[cfg(feature = "serde")]
+use crate::PROTO_VERSION;
 use openssl::error::ErrorStack;
 use std::fmt;
 
@@ -19,16 +21,28 @@ pub enum Error {
     Signer(SignerError),
     Verifier(VerifierError),
     KeyGen(ErrorStack),
-    NoPreviousBlock,
-    PublicConversion(ErrorStack),
     GenesisIsNotKey,
     #[cfg(feature = "serde")]
-    IncompatibleVersion,
+    IncompatibleVersion(u8),
 }
 
 impl fmt::Display for Error {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        todo!()
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::Signer(err) => write!(f, "{}", err),
+            Error::Verifier(err) => write!(f, "{}", err),
+            Error::KeyGen(err) => write!(f, "Couldn't generate new ED25519 keypair ({})", err),
+            Error::GenesisIsNotKey => write!(
+                f,
+                "Genesis block's don't contain pkeys but it was queried for"
+            ),
+            #[cfg(feature = "serde")]
+            Error::IncompatibleVersion(found) => write!(
+                f,
+                "Inputted protocol version (v{}) doesn't match ours (v{})",
+                found, PROTO_VERSION
+            ),
+        }
     }
 }
 
@@ -52,8 +66,20 @@ impl From<SignerError> for Error {
 }
 
 impl fmt::Display for SignerError {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        todo!()
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            SignerError::Create(err) => {
+                write!(f, "Couldn't create signer to create a new hash ({})", err)
+            }
+            SignerError::Update(err) => write!(
+                f,
+                "Couldn't update signer with data to create a new hash ({})",
+                err
+            ),
+            SignerError::Execute(err) => {
+                write!(f, "Couldn't execute signer to create a new hash ({})", err)
+            }
+        }
     }
 }
 
@@ -77,8 +103,14 @@ impl From<VerifierError> for Error {
 }
 
 impl fmt::Display for VerifierError {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        todo!()
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            VerifierError::Create(err) => write!(f, "Couldn't create block verifier ({})", err),
+            VerifierError::Update(err) => {
+                write!(f, "Couldn't update block verifier with hash ({})", err)
+            }
+            VerifierError::Execute(err) => write!(f, "Couldn't execute block verifier ({})", err),
+        }
     }
 }
 
@@ -109,6 +141,12 @@ mod tests {
 
     #[test]
     fn incompatible_version() {
-        Error::IncompatibleVersion;
+        assert_eq!(
+            format!("{}", Error::IncompatibleVersion(20)),
+            format!(
+                "Inputted protocol version (v20) doesn't match ours (v{})",
+                PROTO_VERSION
+            )
+        )
     }
 }
