@@ -22,6 +22,8 @@ pub enum Error {
     NoPreviousBlock,
     PublicConversion(ErrorStack),
     GenesisIsNotKey,
+    #[cfg(feature = "serde")]
+    IncompatibleVersion,
 }
 
 impl fmt::Display for Error {
@@ -96,5 +98,17 @@ impl<T> From<SignerError> for Result<T> {
 impl<T> From<VerifierError> for Result<T> {
     fn from(err: VerifierError) -> Self {
         Result::Err(err.into())
+    }
+}
+
+/// Serde testing
+#[cfg(feature = "serde")]
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn incompatible_version() {
+        Error::IncompatibleVersion;
     }
 }

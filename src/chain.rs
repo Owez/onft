@@ -110,7 +110,7 @@ impl Chain {
     /// ];
     ///
     /// let mut chain = Chain::default();
-    /// chain.extend_data(data_slice).unwrap();
+    /// chain.extend_data(data_vec).unwrap();
     ///
     /// println!("Chain: {:?}", chain);
     /// ```

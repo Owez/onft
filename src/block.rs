@@ -2,6 +2,8 @@
 
 use crate::{error::Error, Hash, Result};
 use openssl::pkey::{PKey, Private, Public};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// Single block within a larger blockchain, providing access to a block of data
 ///
@@ -124,12 +126,12 @@ impl Default for Block {
 /// Contains ownership keys and information for a given block
 #[derive(Debug, Clone)]
 pub enum Ownership {
+    /// Special genesis ownership type as the genesis block is owned by nobody.
+    Genesis,
     /// Owned by an external source as we have a general public key.
     Them(PKey<Public>),
     /// Owned by us as we have a private key.
     Us(PKey<Private>),
-    /// Special genesis ownership type as the genesis block is owned by nobody.
-    Genesis,
 }
 
 impl From<PKey<Public>> for Ownership {
@@ -141,5 +143,35 @@ impl From<PKey<Public>> for Ownership {
 impl From<PKey<Private>> for Ownership {
     fn from(pkey: PKey<Private>) -> Self {
         Self::Us(pkey)
+    }
+}
+
+#[cfg(feature = "serde")]
+impl Serialize for Ownership {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        const NAME: &str = "Ownership";
+        let ser_err = |msg| serde::ser::Error::custom(msg);
+        match self {
+            Ownership::Genesis => serializer.serialize_unit_variant(NAME, 0, "Genesis"),
+            Ownership::Them(pkey) => serializer.serialize_newtype_variant(
+                NAME,
+                1,
+                "Them",
+                &pkey
+                    .raw_public_key()
+                    .map_err(|_| ser_err("Couldn't convert pkey to raw public key"))?,
+            ),
+            Ownership::Us(pkey) => serializer.serialize_newtype_variant(
+                NAME,
+                1,
+                "Us",
+                &pkey
+                    .raw_private_key()
+                    .map_err(|_| ser_err("Couldn't convert pkey to raw private key"))?,
+            ),
+        }
     }
 }

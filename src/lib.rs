@@ -38,7 +38,10 @@
 
 #![deny(unsafe_code)]
 #![warn(missing_docs)]
-#![doc(html_logo_url = "https://raw.githubusercontent.com/Owez/onft/master/logo.png", html_favicon_url = "https://raw.githubusercontent.com/Owez/onft/master/logo.png")]
+#![doc(
+    html_logo_url = "https://raw.githubusercontent.com/Owez/onft/master/logo.png",
+    html_favicon_url = "https://raw.githubusercontent.com/Owez/onft/master/logo.png"
+)]
 
 pub mod error;
 
@@ -50,6 +53,10 @@ pub use block::{Block, Ownership};
 pub use chain::Chain;
 pub use error::Result;
 pub use hash::Hash;
+
+/// Defines the breaking abi protocol version this release uses for (de)serialization
+#[cfg(feature = "serde")]
+pub const PROTO_VERSION: u8 = 1;
 
 /// Light prelude layer which provides direct imports
 ///

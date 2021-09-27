@@ -36,6 +36,7 @@ use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
 ///     Ok(())
 /// }
 /// ```
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Hash([u8; 32]);
 
