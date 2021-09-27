@@ -1,7 +1,5 @@
 //! Contains [Block], [Ownership] and implementations
 
-#[cfg(feature = "serde")]
-use crate::PROTO_VERSION;
 use crate::{error::Error, Hash, Result};
 use openssl::pkey::{PKey, Private, Public};
 #[cfg(feature = "serde")]
@@ -153,6 +151,17 @@ pub enum Ownership {
     Us(PKey<Private>),
 }
 
+impl Ownership {
+    /// Converts ownership to a public key, used primarily for serialization if enabled
+    pub fn to_raw_public(&self) -> Result<Vec<u8>> {
+        match self {
+            Self::Genesis => Err(Error::GenesisIsNotKey),
+            Self::Them(pkey) => pkey.raw_public_key().map_err(Error::KeyPublic),
+            Self::Us(pkey) => pkey.raw_public_key().map_err(Error::KeyPublic),
+        }
+    }
+}
+
 impl From<PKey<Public>> for Ownership {
     fn from(pkey: PKey<Public>) -> Self {
         Self::Them(pkey)
@@ -171,27 +180,11 @@ impl Serialize for Ownership {
     where
         S: serde::Serializer,
     {
-        const NAME: &str = "Ownership";
-        let ser_err = |msg| serde::ser::Error::custom(msg);
-        match self {
-            Ownership::Genesis => serializer.serialize_unit_variant(NAME, 0, "Genesis"),
-            Ownership::Them(pkey) => serializer.serialize_newtype_variant(
-                NAME,
-                1,
-                "Them",
-                &pkey
-                    .raw_public_key()
-                    .map_err(|_| ser_err("Couldn't convert pkey to raw public key"))?,
-            ),
-            Ownership::Us(pkey) => serializer.serialize_newtype_variant(
-                NAME,
-                1,
-                "Us",
-                &pkey
-                    .raw_private_key()
-                    .map_err(|_| ser_err("Couldn't convert pkey to raw private key"))?,
-            ),
-        }
+        serializer.serialize_bytes(
+            &self
+                .to_raw_public()
+                .map_err(|err| serde::ser::Error::custom(&format!("{}", err)))?[..],
+        )
     }
 }
 

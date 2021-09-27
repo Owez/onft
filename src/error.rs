@@ -2,15 +2,15 @@
 //!
 //! # Structure
 //!
-//! The structure of this erroring system is simple and reflects implementations such as [std::io]'s structure but less complex. It is structured in a high-level sense as such:
+//! The structure of this erroring system is simple and reflects implementations
+//! such as [std::io]'s structure but less complex. It is structured in a
+//! high-level sense as such:
 //!
 //! - Abstract library error: [Error]
 //!     - Whilst signing a block: [SignerError]
 //!     - Whilst verifying a block: [VerifierError]
 //! - Module result wrapper type: [Result]
 
-#[cfg(feature = "serde")]
-use crate::PROTO_VERSION;
 use openssl::error::ErrorStack;
 use std::fmt;
 
@@ -21,9 +21,8 @@ pub enum Error {
     Signer(SignerError),
     Verifier(VerifierError),
     KeyGen(ErrorStack),
+    KeyPublic(ErrorStack),
     GenesisIsNotKey,
-    #[cfg(feature = "serde")]
-    IncompatibleVersion(u8),
 }
 
 impl fmt::Display for Error {
@@ -32,15 +31,10 @@ impl fmt::Display for Error {
             Error::Signer(err) => write!(f, "{}", err),
             Error::Verifier(err) => write!(f, "{}", err),
             Error::KeyGen(err) => write!(f, "Couldn't generate new ED25519 keypair ({})", err),
+            Error::KeyPublic(err) => write!(f, "Couldn't convert pkey to raw public key ({})", err),
             Error::GenesisIsNotKey => write!(
                 f,
                 "Genesis block's don't contain pkeys but it was queried for"
-            ),
-            #[cfg(feature = "serde")]
-            Error::IncompatibleVersion(found) => write!(
-                f,
-                "Inputted protocol version (v{}) doesn't match ours (v{})",
-                found, PROTO_VERSION
             ),
         }
     }
@@ -130,23 +124,5 @@ impl<T> From<SignerError> for Result<T> {
 impl<T> From<VerifierError> for Result<T> {
     fn from(err: VerifierError) -> Self {
         Result::Err(err.into())
-    }
-}
-
-/// Serde testing
-#[cfg(feature = "serde")]
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn incompatible_version() {
-        assert_eq!(
-            format!("{}", Error::IncompatibleVersion(20)),
-            format!(
-                "Inputted protocol version (v20) doesn't match ours (v{})",
-                PROTO_VERSION
-            )
-        )
     }
 }

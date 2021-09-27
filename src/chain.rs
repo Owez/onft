@@ -1,6 +1,8 @@
 //! Contains [Chain] and implementations
 
 use crate::{error::Result, Block};
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// Representation of an Onft blockchain
 ///
@@ -33,6 +35,7 @@ use crate::{error::Result, Block};
 ///     eprintln!("Not verified")
 /// }
 /// ```
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone)]
 pub struct Chain(Vec<Block>);
 
@@ -132,6 +135,3 @@ impl Default for Chain {
         Self(vec![Block::default()])
     }
 }
-
-// TODO: serialize
-// TODO: deserialize

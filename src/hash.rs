@@ -166,6 +166,7 @@ fn gen_keypair() -> Result<PKey<Private>> {
 }
 
 fn hash_triplet(previous: &Hash, signature: impl AsRef<[u8]>, data: impl AsRef<[u8]>) -> [u8; 32] {
+    // TODO: #11 <https://github.com/Owez/onft/issues/11>
     let mut hasher = Sha256::new();
     hasher.update(&previous.0[..]);
     hasher.update(signature.as_ref());
