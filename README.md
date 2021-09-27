@@ -6,7 +6,7 @@
     <a href="https://docs.rs/onft/"><img src="https://docs.rs/onft/badge.svg" alt="Docs"></a>
 </p>
 <p align="center">
-    Bespoke protocol and high-level implementation of Non-fungible token (NFT) technology 🚀
+    Bespoke toolkit for Non-fungible token (NFT) technology 🚀
 </p>
 
 ## What is Onft?

@@ -1,7 +1,7 @@
 [package]
 name = "onft"
 version = "0.1.0-beta.2"
-description = "Bespoke protocol and high-level implementation of Non-fungible token (NFT) technology 🚀"
+description = "Bespoke toolkit for Non-fungible token (NFT) technology 🚀"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 authors = ["Owen Griffiths <root@ogriffiths.com>"]

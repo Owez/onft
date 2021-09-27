@@ -1,4 +1,4 @@
-//! Bespoke protocol and high-level implementation of Non-fungible token (NFT) technology 🚀
+//! Bespoke toolkit for Non-fungible token (NFT) technology 🚀
 //!
 //! # What is Onft?
 //!
