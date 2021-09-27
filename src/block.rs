@@ -139,7 +139,8 @@ impl Serialize for Block {
         state.serialize_field("pver", &PROTO_VERSION)?; // custom protocol version
         state.serialize_field("hash", &self.hash)?;
         state.serialize_field("ownership", &self.ownership)?;
-        state.serialize_field("data", &self.data)?;
+        state.serialize_field("data", &self.data.inner)?;
+        state.serialize_field("data_hash", &self.data.hash)?;
         state.end()
     }
 }
