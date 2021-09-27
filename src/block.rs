@@ -1,7 +1,8 @@
 //! Contains [Block], [Ownership] and implementations
 
-use crate::{error::Error, Hash, Result};
+use crate::{error::Error, Hash, Result, DEFAULT_GENESIS};
 use openssl::pkey::{PKey, Private, Public};
+use openssl::sha::Sha256;
 #[cfg(feature = "serde")]
 use serde::{ser::SerializeStruct, Serialize};
 
@@ -18,14 +19,14 @@ use serde::{ser::SerializeStruct, Serialize};
 /// # Example
 ///
 /// ```rust
-/// use onft::Block;
+/// use onft::prelude::*;
 ///
 /// fn main() -> onft::Result<()> {
 ///     let genesis_block = Block::default();
 ///
 ///     let data = "Hello, world!";
-///     let new_block = Block::new(&genesis_block.hash, data)?;
-///     let verified = new_block.verify(&genesis_block.hash)?;
+///     let new_block = Block::new(&genesis_block, data)?;
+///     let verified = new_block.verify(&genesis_block)?;
 ///
 ///     if verified {
 ///         println!("Verified")
@@ -43,8 +44,8 @@ pub struct Block {
     pub ownership: Ownership,
     /// Signature which wraps data into a key to verify ownership.
     pub signature: [u8; Hash::SIG_LEN],
-    /// Underlying data contained within this block.
-    pub data: Vec<u8>,
+    /// Underlying data contained for this block.
+    pub data: BlockData,
 }
 
 impl<'a> Block {
@@ -54,21 +55,21 @@ impl<'a> Block {
     /// # Example
     ///
     /// ```rust
-    /// use onft::Block;
+    /// use onft::prelude::*;
     ///
     /// fn main() -> onft::Result<()> {
     ///     let genesis_block = Block::default();
     ///
     ///     let data = "Hello, world!";
-    ///     let block = Block::new(&genesis_block.hash, data)?;
+    ///     let block = Block::new(&genesis_block, data)?;
     ///
     ///     println!("Block:\n{:?}", block);
     ///     Ok(())
     /// }
     /// ```
     pub fn new(previous_hash: impl Into<&'a Hash>, data: impl Into<Vec<u8>>) -> Result<Self> {
-        let data = data.into();
-        let (hash, signature, pkey) = Hash::new(previous_hash, data.as_slice())?;
+        let data = BlockData::new(data.into())?;
+        let (hash, signature, pkey) = Hash::new(previous_hash, data.hash)?;
         Ok(Self {
             hash,
             ownership: pkey.into(),
@@ -82,14 +83,14 @@ impl<'a> Block {
     /// # Example
     ///
     /// ```rust
-    /// use onft::Block;
+    /// use onft::prelude::*;
     ///
     /// fn main() -> onft::Result<()> {
     ///     let genesis_block = Block::default();
     ///
     ///     let data = "Hello, world!";
-    ///     let new_block = Block::new(&genesis_block.hash, data)?;
-    ///     let verified = new_block.verify(&genesis_block.hash)?;
+    ///     let new_block = Block::new(&genesis_block, data)?;
+    ///     let verified = new_block.verify(&genesis_block)?;
     ///
     ///     if verified {
     ///         println!("Verified")
@@ -101,11 +102,16 @@ impl<'a> Block {
     /// ```
     pub fn verify(&self, previous_hash: impl Into<&'a Hash>) -> Result<bool> {
         let previous_hash = previous_hash.into();
-        let data = self.data.as_slice();
+        let data_hash = self.data.hash;
 
         match &self.ownership {
-            Ownership::Them(pkey) => self.hash.verify(previous_hash, self.signature, data, pkey),
-            Ownership::Us(pkey) => self.hash.verify(previous_hash, self.signature, data, pkey),
+            Ownership::Them(pkey) => {
+                self.hash
+                    .verify(previous_hash, self.signature, data_hash, pkey)
+            }
+            Ownership::Us(pkey) => self
+                .hash
+                .verify(previous_hash, self.signature, data_hash, pkey),
             Ownership::Genesis => Err(Error::GenesisIsNotKey),
         }
     }
@@ -118,7 +124,7 @@ impl Default for Block {
             hash: Hash::default(),
             ownership: Ownership::Genesis,
             signature: [0; Hash::SIG_LEN],
-            data: vec![],
+            data: BlockData::default(),
         }
     }
 }
@@ -139,6 +145,64 @@ impl Serialize for Block {
 }
 
 // TODO: deserialize
+
+/// Data contained within a given block along with it's SHA256 hash
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BlockData {
+    /// Actual data in a byte vector
+    pub inner: Vec<u8>,
+    /// Computed hash of data to use for constructing/verifying block hashes
+    pub hash: [u8; 32],
+}
+
+impl BlockData {
+    /// Creates new instance from data, hashing automatically
+    pub fn new(data: impl Into<Vec<u8>>) -> Result<Self> {
+        let mut hasher = Sha256::new();
+        let data = data.into();
+        hasher.update(data.as_slice());
+        Ok(Self {
+            inner: data,
+            hash: hasher.finish(),
+        })
+    }
+}
+
+impl Default for BlockData {
+    fn default() -> Self {
+        Self {
+            inner: vec![],
+            hash: DEFAULT_GENESIS,
+        }
+    }
+}
+
+impl From<BlockData> for Vec<u8> {
+    fn from(block_data: BlockData) -> Self {
+        block_data.inner
+    }
+}
+
+impl<'a> From<&'a BlockData> for &'a [u8] {
+    fn from(block_data: &'a BlockData) -> Self {
+        &block_data.inner[..]
+    }
+}
+
+impl From<BlockData> for [u8; 32] {
+    fn from(block_data: BlockData) -> Self {
+        block_data.hash
+    }
+}
+
+impl From<&BlockData> for [u8; 32] {
+    fn from(block_data: &BlockData) -> Self {
+        block_data.hash
+    }
+}
+
+// TODO: try_into
 
 /// Contains ownership keys and information for a given block
 #[derive(Debug, Clone)]

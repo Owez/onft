@@ -3,7 +3,7 @@
 //! # Example
 //!
 //! ```rust
-//! use onft::Chain;
+//! use onft::prelude::*;
 //!
 //! // create
 //! let mut chain = Chain::default();
@@ -49,7 +49,7 @@ mod block;
 mod chain;
 mod hash;
 
-pub use block::{Block, Ownership};
+pub use block::{Block, BlockData, Ownership};
 pub use chain::Chain;
 pub use error::Result;
 pub use hash::Hash;
@@ -57,6 +57,12 @@ pub use hash::Hash;
 /// Defines the breaking ABI protocol version this release uses for (de)serialization
 #[cfg(feature = "serde")]
 pub const PROTO_VERSION: u8 = 1;
+
+/// Defines the default initializer for SHA-256 hashes, used for genesis hashes
+pub(crate) const DEFAULT_GENESIS: [u8; 32] = [
+    66, 108, 111, 111, 100, 121, 32, 103, 101, 110, 101, 115, 105, 115, 32, 98, 108, 111, 99, 107,
+    32, 109, 101, 115, 115, 97, 103, 101, 115, 46, 46, 46,
+];
 
 /// Light prelude layer which provides direct imports
 ///
@@ -79,5 +85,5 @@ pub const PROTO_VERSION: u8 = 1;
 /// ```
 pub mod prelude {
     pub use crate::error::{SignerError, VerifierError};
-    pub use crate::{error, Block, Chain, Hash, Ownership};
+    pub use crate::{error, Block, BlockData, Chain, Hash, Ownership};
 }

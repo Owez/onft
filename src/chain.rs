@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 /// # Example
 ///
 /// ```rust
-/// use onft::Chain;
+/// use onft::prelude::*;
 ///
 /// // create
 /// let mut chain = Chain::default();
@@ -45,7 +45,7 @@ impl Chain {
     /// # Example
     ///
     /// ```rust
-    /// use onft::Chain;
+    /// use onft::prelude::*;
     ///
     /// // create
     /// let mut chain = Chain::default();
@@ -85,7 +85,7 @@ impl Chain {
     /// # Example
     ///
     /// ```rust
-    /// use onft::Chain;
+    /// use onft::prelude::*;
     ///
     /// let mut chain = Chain::default();
     /// chain.push_data("Hello, world!").unwrap();
@@ -105,7 +105,7 @@ impl Chain {
     /// # Example
     ///
     /// ```rust
-    /// use onft::Chain;
+    /// use onft::prelude::*;
     ///
     /// let data_vec = vec![
     ///     "Hello".as_bytes(), "world".as_bytes(),

@@ -1,7 +1,7 @@
 //! Contains [Hash](struct@Hash) and implementations
 
 use crate::error::{Error, SignerError, VerifierError};
-use crate::{Block, Result};
+use crate::{Block, Result, DEFAULT_GENESIS};
 use openssl::pkey::{HasPublic, PKey, PKeyRef, Private};
 use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
 
@@ -19,13 +19,13 @@ use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
 /// # Example
 ///
 /// ```rust
-/// use onft::Hash;
+/// use onft::prelude::*;
 ///
 /// fn main() -> onft::Result<()> {
 ///     let genesis_hash = Hash::default();
 ///
-///     let data = "Hello, world!";
-///     let (new_hash, signature, pkey) = Hash::new(&genesis_hash, data)?;
+///     let data = BlockData::new("Hello, world!")?;
+///     let (new_hash, signature, pkey) = Hash::new(&genesis_hash, &data)?;
 ///     let verified = new_hash.verify(&genesis_hash, signature, data, &pkey)?;
 ///
 ///     if verified {
@@ -53,12 +53,12 @@ impl<'a> Hash {
     /// # Example
     ///
     /// ```rust
-    /// use onft::Hash;
+    /// use onft::prelude::*;
     ///
     /// fn main() -> onft::Result<()> {
     ///     let genesis_hash = Hash::default();
     ///
-    ///     let data = "Hello, world!";
+    ///     let data = BlockData::new("Hello, world!")?;
     ///     let (new_hash, _, _) = Hash::new(&genesis_hash, data)?;
     ///
     ///     println!("Hash:\n{:?}", new_hash);
@@ -67,9 +67,9 @@ impl<'a> Hash {
     /// ```
     pub fn new(
         previous: impl Into<&'a Hash>,
-        data: impl AsRef<[u8]>,
+        data_hash: impl Into<[u8; 32]>,
     ) -> Result<(Self, [u8; Self::SIG_LEN], PKey<Private>)> {
-        Self::new_existing_keypair(previous, data, gen_keypair()?)
+        Self::new_existing_keypair(previous, data_hash, gen_keypair()?)
     }
 
     /// Verifies current hash using it's known `signature`, the `pkey` public key
@@ -78,13 +78,13 @@ impl<'a> Hash {
     /// # Example
     ///
     /// ```rust
-    /// use onft::Hash;
+    /// use onft::prelude::*;
     ///
     /// fn main() -> onft::Result<()> {
     ///     let genesis_hash = Hash::default();
     ///
-    ///     let data = "Hello, world!";
-    ///     let (new_hash, signature, pkey) = Hash::new(&genesis_hash, data)?;
+    ///     let data = BlockData::new("Hello, world!")?;
+    ///     let (new_hash, signature, pkey) = Hash::new(&genesis_hash, &data)?;
     ///     let verified = new_hash.verify(&genesis_hash, signature, data, &pkey)?;
     ///
     ///     if verified {
@@ -99,16 +99,17 @@ impl<'a> Hash {
         &self,
         previous: impl Into<&'a Hash>,
         signature: impl AsRef<[u8]>,
-        data: impl AsRef<[u8]>,
+        data_hash: impl Into<[u8; 32]>,
         pkey: &PKeyRef<impl HasPublic>,
     ) -> Result<bool> {
         let mut verifier = Verifier::new_without_digest(pkey).map_err(VerifierError::Create)?;
+        let data_hash = data_hash.into();
         let signature_verified = verifier
-            .verify_oneshot(signature.as_ref(), data.as_ref())
+            .verify_oneshot(signature.as_ref(), &data_hash[..])
             .map_err(VerifierError::Execute)?;
 
         Ok(if signature_verified {
-            self.0 == hash_triplet(previous.into(), signature, data)
+            self.0 == hash_triplet(previous.into(), signature, data_hash)
         } else {
             false
         })
@@ -118,7 +119,7 @@ impl<'a> Hash {
     /// within the hash, manually inputting the public/private keypair.
     fn new_existing_keypair(
         previous: impl Into<&'a Hash>,
-        data: impl AsRef<[u8]>,
+        data_hash: impl Into<[u8; 32]>,
         keypair: PKey<Private>,
     ) -> Result<(Self, [u8; Self::SIG_LEN], PKey<Private>)> {
         let keypair_signer = keypair.clone();
@@ -126,13 +127,14 @@ impl<'a> Hash {
         let mut signer =
             Signer::new_without_digest(&keypair_signer).map_err(SignerError::Create)?;
 
+        let data_hash = data_hash.into();
         let mut signature = [0; Self::SIG_LEN];
         signer
-            .sign_oneshot(&mut signature, data.as_ref())
+            .sign_oneshot(&mut signature, &data_hash[..])
             .map_err(SignerError::Update)?;
 
         Ok((
-            Self(hash_triplet(previous.into(), signature, data)),
+            Self(hash_triplet(previous.into(), signature, data_hash)),
             signature,
             keypair,
         ))
@@ -142,10 +144,7 @@ impl<'a> Hash {
 impl Default for Hash {
     /// Creates default genesis hash.
     fn default() -> Self {
-        Self([
-            66, 108, 111, 111, 100, 121, 32, 103, 101, 110, 101, 115, 105, 115, 32, 98, 108, 111,
-            99, 107, 32, 109, 101, 115, 115, 97, 103, 101, 115, 46, 46, 46,
-        ])
+        Self(DEFAULT_GENESIS)
     }
 }
 
@@ -165,18 +164,19 @@ fn gen_keypair() -> Result<PKey<Private>> {
     PKey::generate_ed25519().map_err(Error::KeyGen)
 }
 
-fn hash_triplet(previous: &Hash, signature: impl AsRef<[u8]>, data: impl AsRef<[u8]>) -> [u8; 32] {
+fn hash_triplet(previous: &Hash, signature: impl AsRef<[u8]>, data_hash: [u8; 32]) -> [u8; 32] {
     // TODO: #11 <https://github.com/Owez/onft/issues/11>
     let mut hasher = Sha256::new();
     hasher.update(&previous.0[..]);
     hasher.update(signature.as_ref());
-    hasher.update(data.as_ref());
+    hasher.update(&data_hash[..]);
     hasher.finish()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::BlockData;
 
     #[test]
     fn gen_keypair() {
@@ -185,10 +185,10 @@ mod tests {
 
     #[test]
     fn create_verify_hash() {
-        const DATA: &str = "Hello, world!";
-        let (hash, signature, pkey) = Hash::new(&Hash::default(), DATA.as_bytes()).unwrap();
+        let data = BlockData::new("Hello, world!").unwrap();
+        let (hash, signature, pkey) = Hash::new(&Hash::default(), &data).unwrap();
         let verified = hash
-            .verify(&Hash::default(), signature, DATA, &pkey)
+            .verify(&Hash::default(), signature, data, &pkey)
             .unwrap();
 
         if !verified {
