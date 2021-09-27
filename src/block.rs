@@ -147,18 +147,22 @@ impl Serialize for Block {
 
 // TODO: deserialize
 
-/// Data contained within a given block along with it's SHA256 hash
+/// Data contained within a block along with it's hash to be used downstream
+///
+/// # Example
+///
+/// TODO: example
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BlockData {
-    /// Actual data in a byte vector
+    /// Actual data in a byte vector.
     pub inner: Vec<u8>,
-    /// Computed hash of data to use for constructing/verifying block hashes
+    /// Computed hash of data to use for constructing/verifying block hashes.
     pub hash: [u8; 32],
 }
 
 impl BlockData {
-    /// Creates new instance from data, hashing automatically
+    /// Creates new instance from data, hashing automatically.
     pub fn new(data: impl Into<Vec<u8>>) -> Result<Self> {
         let mut hasher = Sha256::new();
         let data = data.into();
@@ -217,7 +221,7 @@ pub enum Ownership {
 }
 
 impl Ownership {
-    /// Converts ownership to a public key, used primarily for serialization if enabled
+    /// Converts ownership to a public key, used primarily for serialization if enabled.
     pub fn to_raw_public(&self) -> Result<Vec<u8>> {
         match self {
             Self::Genesis => Err(Error::GenesisIsNotKey),
