@@ -132,3 +132,6 @@ impl Default for Chain {
         Self(vec![Block::default()])
     }
 }
+
+// TODO: serialize
+// TODO: deserialize

@@ -1,9 +1,11 @@
 //! Contains [Block], [Ownership] and implementations
 
+#[cfg(feature = "serde")]
+use crate::PROTO_VERSION;
 use crate::{error::Error, Hash, Result};
 use openssl::pkey::{PKey, Private, Public};
 #[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+use serde::{ser::SerializeStruct, Serialize};
 
 /// Single block within a larger blockchain, providing access to a block of data
 ///
@@ -123,6 +125,23 @@ impl Default for Block {
     }
 }
 
+#[cfg(feature = "serde")]
+impl Serialize for Block {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_struct("Block", 4 + 1)?;
+        state.serialize_field("pver", &PROTO_VERSION)?; // custom protocol version
+        state.serialize_field("hash", &self.hash)?;
+        state.serialize_field("ownership", &self.ownership)?;
+        state.serialize_field("data", &self.data)?;
+        state.end()
+    }
+}
+
+// TODO: deserialize
+
 /// Contains ownership keys and information for a given block
 #[derive(Debug, Clone)]
 pub enum Ownership {
@@ -175,3 +194,5 @@ impl Serialize for Ownership {
         }
     }
 }
+
+// TODO: deserialize

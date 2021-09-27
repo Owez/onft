@@ -54,7 +54,7 @@ pub use chain::Chain;
 pub use error::Result;
 pub use hash::Hash;
 
-/// Defines the breaking abi protocol version this release uses for (de)serialization
+/// Defines the breaking ABI protocol version this release uses for (de)serialization
 #[cfg(feature = "serde")]
 pub const PROTO_VERSION: u8 = 1;
 
