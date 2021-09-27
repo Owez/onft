@@ -9,6 +9,12 @@
     Bespoke protocol and high-level implementation of Non-fungible token (NFT) technology 🚀
 </p>
 
+# What is Onft?
+
+Instead of forcing a consensus algorithm or peer networking on you, Onft provides you with the tools to create a reliable and *fast* NFT system 👐
+
+This allows you to focus on implementing the important stuff, as well as getting benefits such as automatic improvements and updates over this project's lifecycle, whilst still being fully standardized!
+
 ## Example
 
 ```rust

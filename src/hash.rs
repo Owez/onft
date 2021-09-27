@@ -9,7 +9,11 @@ use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
 ///
 /// # Using
 ///
-/// You can in high level terms do the following directly to a hash:
+/// Due to simplicity and the inherent low-level nature of dealing with hashes
+/// directly, it's recommended that you instead use the [Block](crate::Block)
+/// interface or even higher to the typical [Chain](crate::Chain) if at all
+/// possible. You still can however, in high level terms, do the following
+/// directly to a this data item:
 ///
 /// - Create a genesis hash: [Hash::default]
 /// - Create a hash containing hashed data: [Hash::new]
@@ -165,7 +169,6 @@ fn gen_keypair() -> Result<PKey<Private>> {
 }
 
 fn hash_triplet(previous: &Hash, signature: impl AsRef<[u8]>, data_hash: [u8; 32]) -> [u8; 32] {
-    // TODO: #11 <https://github.com/Owez/onft/issues/11>
     let mut hasher = Sha256::new();
     hasher.update(&previous.0[..]);
     hasher.update(signature.as_ref());

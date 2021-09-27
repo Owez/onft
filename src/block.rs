@@ -10,7 +10,7 @@ use serde::{ser::SerializeStruct, Serialize};
 ///
 /// # Using
 ///
-/// You can in high level terms do the following directly to a block:
+/// You can, in high level terms, do the following directly to a block:
 ///
 /// - Create a genesis block: [Block::default]
 /// - Create a block containing data: [Block::new]

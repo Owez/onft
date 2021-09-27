@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Using
 ///
-/// You can in high level terms do the following directly to a blockchain:
+/// You can, in high level terms, do the following directly to a blockchain:
 ///
 /// - Create an initial blockchain: [Chain::default]
 /// - Add some data inside a new block: [Chain::push_data]
