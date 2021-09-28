@@ -1,8 +1,9 @@
 //! Contains [Block], [Ownership] and implementations
 
 use crate::{error::Error, Hash, Result, DEFAULT_GENESIS};
-use openssl::pkey::{PKey, Private, Public};
+use openssl::pkey::{Id, PKey, Private, Public};
 use openssl::sha::Sha256;
+use serde::{de::Visitor, Deserialize}; // TODO: merge with `#[cfg(feature = "serde")]` item
 #[cfg(feature = "serde")]
 use serde::{ser::SerializeStruct, Serialize};
 
@@ -229,6 +230,13 @@ impl Ownership {
             Self::Us(pkey) => pkey.raw_public_key().map_err(Error::KeyPublic),
         }
     }
+
+    /// Converts provided `bytes` into a public key
+    fn from_public_raw(bytes: impl AsRef<[u8]>) -> Result<Self> {
+        let pkey = PKey::public_key_from_raw_bytes(bytes.as_ref(), Id::ED25519)
+            .map_err(Error::KeyPublic)?;
+        Ok(Self::Them(pkey))
+    }
 }
 
 impl From<PKey<Public>> for Ownership {
@@ -264,4 +272,33 @@ impl Serialize for Ownership {
     }
 }
 
-// TODO: deserialize
+// TODO: #[cfg(feature = "serde")]
+// TODO: test
+impl<'de> Visitor<'de> for Ownership {
+    type Value = Self;
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            formatter,
+            "nothing for `Genesis` variant or valid byte array for the `Them` variant"
+        )
+    }
+
+    fn visit_bytes<E>(self, v: &[u8]) -> std::result::Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Ownership::from_public_raw(v).map_err(|err| serde::de::Error::custom(err))
+    }
+}
+
+// TODO: #[cfg(feature = "serde")]
+// TODO: test
+impl<'de> Deserialize<'de> for Ownership {
+    fn deserialize<D>(_deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        todo!("match self then use visitor")
+    }
+}
