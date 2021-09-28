@@ -17,6 +17,8 @@ This allows you to focus on implementing the important stuff, as well as getting
 
 ## Example
 
+Simple creating, adding and verifying procedure based upon the typical `Chain` flow:
+
 ```rust
 use onft::Chain;
 

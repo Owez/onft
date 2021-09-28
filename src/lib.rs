@@ -8,6 +8,8 @@
 //!
 //! # Example
 //!
+//! Simple creating, adding and verifying procedure based upon the typical [Chain] flow:
+//!
 //! ```rust
 //! use onft::prelude::*;
 //!
