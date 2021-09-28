@@ -16,7 +16,7 @@
 //! println!("Chain: {:?}", chain);
 //!
 //! // add block
-//! chain.push_data("Hello, world!").unwrap();
+//! chain.push("Hello, world!").unwrap();
 //! println!("Chain: {:?}", chain);
 //!
 //! // verify
