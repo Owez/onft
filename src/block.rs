@@ -1,7 +1,7 @@
 //! Contains [Block], [Ownership] and implementations
 
 use crate::{error::Error, Hash, Result, DEFAULT_GENESIS};
-use openssl::pkey::{Id, PKey, Private, Public};
+use openssl::pkey::{PKey, Private, Public};
 use openssl::sha::Sha256;
 #[cfg(feature = "serde")]
 use serde::{ser::SerializeStruct, Serialize};
@@ -146,7 +146,15 @@ impl Serialize for Block {
     }
 }
 
-// TODO: deserialize
+// TODO: #[cfg(feature = "serde")]
+impl<'de> Deserialize<'de> for Block {
+    fn deserialize<D>(_deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        todo!("deserialize block")
+    }
+}
 
 /// Data contained within a block along with it's hash to be used downstream
 ///
@@ -216,25 +224,13 @@ pub enum Ownership {
     /// Special genesis ownership type as the genesis block is owned by nobody.
     Genesis,
     /// Owned by an external source as we have a general public key.
-    // todo: #[cfg_attr(feature = "serde", serde(deserialize_with = "Ownership::from_public_raw"))]
+    // TODO: #[cfg_attr(feature = "serde", serde(deserialize_with = "Ownership::from_public_raw"))]
     #[serde(deserialize_with = "de_pkey_pub")]
     Them(PKey<Public>),
     /// Owned by us as we have a private key.
-    // todo: #[cfg_attr(feature = "serde", serde(skip_deserializing))]
+    // TODO: #[cfg_attr(feature = "serde", serde(skip_deserializing))]
     #[serde(skip_deserializing)]
     Us(PKey<Private>),
-}
-
-// TODO: finish
-/// Produces serde-orientated data into a new pkey instance
-// #[cfg(feature = "serde")]
-fn de_pkey_pub<'de, D>(_data: D) -> std::result::Result<PKey<Public>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    // let pkey = PKey::public_key_from_raw_bytes(bytes.as_ref(), Id::ED25519)
-    //     .map_err(Error::KeyPublic)?;
-    todo!()
 }
 
 impl Ownership {
@@ -279,4 +275,16 @@ impl Serialize for Ownership {
             ),
         }
     }
+}
+
+// TODO: finish
+/// Produces serde-orientated data into a new pkey instance
+// TODO: #[cfg(feature = "serde")]
+fn de_pkey_pub<'de, D>(_data: D) -> std::result::Result<PKey<Public>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    // let pkey = PKey::public_key_from_raw_bytes(bytes.as_ref(), Id::ED25519)
+    //     .map_err(Error::KeyPublic)?;
+    todo!()
 }
