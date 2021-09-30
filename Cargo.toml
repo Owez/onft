@@ -5,6 +5,7 @@ description = "Bespoke toolkit for Non-fungible token (NFT) technology 🚀"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 authors = ["Owen Griffiths <root@ogriffiths.com>"]
+keywords = ["crypto", "blockchain", "blockchain-technology", "nft", "non-fungible-token"]
 edition = "2018"
 
 [dependencies]
