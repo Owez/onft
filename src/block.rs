@@ -1,8 +1,11 @@
 //! Contains [Block], [Ownership] and implementations
 
+use std::fmt;
+
 use crate::{error::Error, Hash, Result, DEFAULT_GENESIS};
 use openssl::pkey::{PKey, Private, Public};
 use openssl::sha::Sha256;
+use serde::de::Visitor;
 #[cfg(feature = "serde")]
 use serde::{ser::SerializeStruct, Serialize};
 use serde::{Deserialize, Deserializer}; // TODO: merge with `#[cfg(feature = "serde")]` item
@@ -146,13 +149,57 @@ impl Serialize for Block {
     }
 }
 
+// NOTE: see docs <https://serde.rs/deserialize-struct.html> for info
 // TODO: #[cfg(feature = "serde")]
 impl<'de> Deserialize<'de> for Block {
-    fn deserialize<D>(_deserializer: D) -> std::result::Result<Self, D::Error>
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
-        todo!("deserialize block")
+        enum Field {
+            ProtoVersion,
+            Ownership,
+            Signature,
+            Data,
+        }
+
+        impl Field {
+            fn expected() -> &'static str {
+                "`pver` or `ownership` or `signature` or `data`"
+            }
+        }
+
+        impl<'de> Deserialize<'de> for Field {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+            where
+                D: Deserializer<'de>,
+            {
+                struct FieldVisitor;
+
+                impl<'de> Visitor<'de> for FieldVisitor {
+                    type Value = Field;
+
+                    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                        formatter.write_str(Field::expected())
+                    }
+                }
+
+                deserializer.deserialize_identifier(FieldVisitor)
+            }
+        }
+
+        struct BlockVisitor;
+
+        impl<'de> Visitor<'de> for BlockVisitor {
+            type Value = Block;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                todo!()
+            }
+        }
+
+        const FIELDS: &[&str] = &["pver", "ownership", "signature", "data"];
+        deserializer.deserialize_struct("Block", FIELDS, BlockVisitor)
     }
 }
 
