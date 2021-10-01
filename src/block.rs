@@ -1,7 +1,5 @@
 //! Contains [Block], [Ownership] and implementations
 
-use std::fmt;
-
 use crate::{error::Error, Hash, Result, DEFAULT_GENESIS};
 use openssl::pkey::{PKey, Private, Public};
 use openssl::sha::Sha256;
@@ -182,6 +180,19 @@ impl<'de> Deserialize<'de> for Block {
                     fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
                         formatter.write_str(Field::expected())
                     }
+
+                    fn visit_str<E>(self, v: &str) -> std::result::Result<Self::Value, E>
+                    where
+                        E: serde::de::Error,
+                    {
+                        match v {
+                            "pver" => Ok(Field::ProtoVersion),
+                            "ownership" => Ok(Field::Ownership),
+                            "signature" => Ok(Field::Signature),
+                            "data" => Ok(Field::Data),
+                            _ => Err(serde::de::Error::unknown_field(v, FIELDS)),
+                        }
+                    }
                 }
 
                 deserializer.deserialize_identifier(FieldVisitor)
@@ -193,8 +204,8 @@ impl<'de> Deserialize<'de> for Block {
         impl<'de> Visitor<'de> for BlockVisitor {
             type Value = Block;
 
-            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-                todo!()
+            fn expecting(&self, _formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                todo!("block deserialization")
             }
         }
 
