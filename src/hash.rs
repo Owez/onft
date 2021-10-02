@@ -4,6 +4,7 @@ use crate::error::{Error, SignerError, VerifierError};
 use crate::{Block, Result, DEFAULT_GENESIS};
 use openssl::pkey::{HasPublic, PKey, PKeyRef, Private};
 use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
+use serde::{Serialize,Deserialize}; // TODO: #[cfg(feature = "serde")]
 
 /// Hash for a block allowing full blockchain usage
 ///
@@ -40,7 +41,8 @@ use openssl::{sha::Sha256, sign::Signer, sign::Verifier};
 ///     Ok(())
 /// }
 /// ```
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Serialize, Deserialize)]
+// #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Hash([u8; 32]);
 
