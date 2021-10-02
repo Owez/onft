@@ -1,12 +1,11 @@
 //! Contains [Block], [Ownership] and implementations
 
+use crate::PROTO_VERSION;
 use crate::{error::Error, Hash, Result, DEFAULT_GENESIS};
 use openssl::pkey::{PKey, Private, Public};
 use openssl::sha::Sha256;
-use serde::de::Visitor;
-#[cfg(feature = "serde")]
-use serde::{ser::SerializeStruct, Serialize};
-use serde::{Deserialize, Deserializer}; // TODO: merge with `#[cfg(feature = "serde")]` item
+use serde::de::{self, Visitor};
+use serde::{ser::SerializeStruct, Deserialize, Deserializer, Serialize}; // TODO: #[cfg(feature = "serde")]
 
 /// Single block within a larger blockchain, providing access to a block of data
 ///
@@ -131,7 +130,6 @@ impl Default for Block {
     }
 }
 
-#[cfg(feature = "serde")]
 impl Serialize for Block {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
     where
@@ -141,8 +139,8 @@ impl Serialize for Block {
         state.serialize_field("pver", &PROTO_VERSION)?; // custom protocol version
         state.serialize_field("hash", &self.hash)?;
         state.serialize_field("ownership", &self.ownership)?;
-        state.serialize_field("data", &self.data.inner)?;
-        state.serialize_field("data_hash", &self.data.hash)?;
+        state.serialize_field("signature", &self.signature)?; // TODO: serde-big-array <https://github.com/est31/serde-big-array>
+        state.serialize_field("block_data", &self.data)?;
         state.end()
     }
 }
@@ -156,14 +154,15 @@ impl<'de> Deserialize<'de> for Block {
     {
         enum Field {
             ProtoVersion,
+            Hash,
             Ownership,
             Signature,
-            Data,
+            BlockData,
         }
 
         impl Field {
             fn expected() -> &'static str {
-                "`pver` or `ownership` or `signature` or `data`"
+                "`pver` or `hash` or `ownership` or `block_data`"
             }
         }
 
@@ -183,14 +182,15 @@ impl<'de> Deserialize<'de> for Block {
 
                     fn visit_str<E>(self, v: &str) -> std::result::Result<Self::Value, E>
                     where
-                        E: serde::de::Error,
+                        E: de::Error,
                     {
                         match v {
                             "pver" => Ok(Field::ProtoVersion),
+                            "hash" => Ok(Field::Hash),
                             "ownership" => Ok(Field::Ownership),
                             "signature" => Ok(Field::Signature),
-                            "data" => Ok(Field::Data),
-                            _ => Err(serde::de::Error::unknown_field(v, FIELDS)),
+                            "data" => Ok(Field::BlockData),
+                            _ => Err(de::Error::unknown_field(v, FIELDS)),
                         }
                     }
                 }
@@ -207,6 +207,40 @@ impl<'de> Deserialize<'de> for Block {
             fn expecting(&self, _formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
                 todo!("block deserialization")
             }
+
+            fn visit_seq<A>(self, mut seq: A) -> std::result::Result<Self::Value, A::Error>
+            where
+                A: de::SeqAccess<'de>,
+            {
+                // proto version check
+                let proto_version: u8 = seq
+                    .next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(0, &self))?;
+                if proto_version != PROTO_VERSION {
+                    todo!("proto version error")
+                }
+
+                // bulk
+                let hash = seq
+                    .next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(1, &self))?;
+                let ownership = seq
+                    .next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(2, &self))?;
+                let signature = seq
+                    .next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(3, &self))?; // TODO: serde-big-array <https://github.com/est31/serde-big-array>
+                let data = seq
+                    .next_element()?
+                    .ok_or_else(|| de::Error::invalid_length(4, &self))?;
+
+                Ok(Block {
+                    hash,
+                    ownership,
+                    signature,
+                    data,
+                })
+            }
         }
 
         const FIELDS: &[&str] = &["pver", "ownership", "signature", "data"];
@@ -219,7 +253,8 @@ impl<'de> Deserialize<'de> for Block {
 /// # Example
 ///
 /// TODO: example
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Serialize, Deserialize)]
+// #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BlockData {
     /// Actual data in a byte vector.
@@ -314,7 +349,7 @@ impl From<PKey<Private>> for Ownership {
     }
 }
 
-#[cfg(feature = "serde")]
+// #[cfg(feature = "serde")]
 impl Serialize for Ownership {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
     where

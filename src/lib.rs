@@ -61,7 +61,7 @@ pub use error::Result;
 pub use hash::Hash;
 
 /// Defines the breaking ABI protocol version this release uses for (de)serialization
-#[cfg(feature = "serde")]
+// #[cfg(feature = "serde")]
 pub const PROTO_VERSION: u8 = 1;
 
 /// Defines the default initializer for SHA-256 hashes, used for genesis hashes
