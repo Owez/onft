@@ -164,6 +164,12 @@ impl<'a> From<&'a Block> for &'a Hash {
     }
 }
 
+impl From<[u8; 32]> for Hash {
+    fn from(inner: [u8; 32]) -> Self {
+        Self(inner)
+    }
+}
+
 fn gen_keypair() -> Result<PKey<Private>> {
     PKey::generate_ed25519().map_err(Error::KeyGen)
 }

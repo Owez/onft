@@ -8,6 +8,8 @@
 //!
 //! # Example
 //!
+//! Simple creating, adding and verifying procedure based upon the typical [Chain] flow:
+//!
 //! ```rust
 //! use onft::prelude::*;
 //!
@@ -16,7 +18,7 @@
 //! println!("Chain: {:?}", chain);
 //!
 //! // add block
-//! chain.push_data("Hello, world!").unwrap();
+//! chain.push("Hello, world!").unwrap();
 //! println!("Chain: {:?}", chain);
 //!
 //! // verify
